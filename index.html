@@ -1034,10 +1034,30 @@
             unzipper.push(chunk, false);
           });
           unzipper.push(new Uint8Array(0), true);
+          if (foundExportXml) processChunk(decoder.decode());
+
+          // 後備：部分手機瀏覽器串流 inflate 會攞唔到資料 → 整份解壓重試
+          if (!foundExportXml || deviceStats.size === 0) {
+            try {
+              const buf = new Uint8Array(await file.arrayBuffer());
+              const files = fflate.unzipSync(buf, { filter: (f) => f.name.endsWith('export.xml') });
+              const entry = Object.keys(files).find((k) => k.endsWith('export.xml'));
+              if (entry) {
+                foundExportXml = true;
+                deviceStats.clear();
+                leftover = '';
+                const d2 = new TextDecoder('utf-8');
+                const text = d2.decode(files[entry]);
+                const STEP = 8 * 1024 * 1024;
+                for (let i = 0; i < text.length; i += STEP) processChunk(text.slice(i, i + STEP));
+                processChunk('');
+              }
+            } catch (e2) {
+              console.warn('ZIP fallback failed:', e2);
+            }
+          }
 
           if (foundExportXml) {
-            // 串流結束後統一 flush＋渲染，避免個別瀏覽器冇觸發 ondata final 而卡住
-            processChunk(decoder.decode());
             renderResults(deviceStats);
           } else {
             setStatus('errNoXml');
