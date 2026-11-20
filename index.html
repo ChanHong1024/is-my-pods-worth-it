@@ -629,6 +629,10 @@
         if (/Max/i.test(en)) return 'max';
         if (/Pro/i.test(en)) return 'pro';
       }
+      // 型號對照表搵唔到時，靠裝置名稱判斷（例如被改名嘅「AirPods Max」）
+      const label = (info.displayName || '') + ' ' + (info.modelCode || '');
+      if (/airpods?\s*max/i.test(label)) return 'max';
+      if (/airpods?\s*pro/i.test(label)) return 'pro';
       return 'airpods';
     }
 
