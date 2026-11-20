@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Is my Pods Worth It? · AirPods 分型號聆聽統計</title>
   <meta name="description" content="Is my Pods Worth It? — 自動解析 Apple 健康 export 嘅 AirPods 分型號聆聽統計，100% 本地離線運作。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
   <style>
@@ -12,7 +15,7 @@
       color-scheme: dark;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       background: #08080d;
@@ -1168,7 +1171,7 @@
     }
 
     // ===== 一鍵生成分享圖（Canvas）=====
-    const SHARE_FONT = '"PingFang HK","PingFang SC","PingFang TC","Microsoft JhengHei","Segoe UI",Roboto,system-ui,sans-serif';
+    const SHARE_FONT = '"Noto Sans TC","PingFang HK","PingFang SC","PingFang TC","Microsoft JhengHei","Segoe UI",Roboto,system-ui,sans-serif';
 
     function dataURLToBlob(dataUrl) {
       const parts = dataUrl.split(',');
@@ -1470,6 +1473,9 @@
       shareModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
       updateSharePreview();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => { if (shareModal && !shareModal.classList.contains('hidden')) updateSharePreview(); });
+      }
       const closeBtn = document.getElementById('shareClose');
       if (closeBtn) closeBtn.focus();
     }
@@ -1498,14 +1504,16 @@
       return 'is-my-pods-worth-it-' + shareCfg.ratio.replace(':', 'x') + '.png';
     }
 
-    function doDownload() {
+    async function doDownload() {
       if (!getShareItems().length) return;
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
       const blob = dataURLToBlob(renderShareCanvas().toDataURL('image/png'));
       downloadBlob(blob, shareFileName());
     }
 
-    function doShare() {
+    async function doShare() {
       if (!getShareItems().length) return;
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
       const blob = dataURLToBlob(renderShareCanvas().toDataURL('image/png'));
       const file = new File([blob], shareFileName(), { type: 'image/png' });
       const shareText = t('shareText');
