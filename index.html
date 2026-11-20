@@ -181,14 +181,14 @@
         <stop offset="0" stop-color="#ffffff"/>
         <stop offset="1" stop-color="#d8e2ee"/>
       </linearGradient>
-      <linearGradient id="apMaxBody" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="92">
-        <stop offset="0" stop-color="#7b8592"/>
-        <stop offset="0.45" stop-color="#4b5563"/>
-        <stop offset="1" stop-color="#232b34"/>
+      <linearGradient id="apMaxBody" gradientUnits="userSpaceOnUse" x1="0" y1="30" x2="0" y2="94">
+        <stop offset="0" stop-color="#f7f1e6"/>
+        <stop offset="0.55" stop-color="#e5dbca"/>
+        <stop offset="1" stop-color="#b6a27f"/>
       </linearGradient>
-      <linearGradient id="apMaxMesh" gradientUnits="userSpaceOnUse" x1="0" y1="50" x2="0" y2="92">
-        <stop offset="0" stop-color="#aeb9c6"/>
-        <stop offset="1" stop-color="#6b7784"/>
+      <linearGradient id="apMaxMesh" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="94">
+        <stop offset="0" stop-color="#f8f3ea"/>
+        <stop offset="1" stop-color="#dccdb7"/>
       </linearGradient>
       <linearGradient id="apSilver" gradientUnits="userSpaceOnUse" x1="0" y1="42" x2="0" y2="56">
         <stop offset="0" stop-color="#ffffff"/>
@@ -196,6 +196,9 @@
       </linearGradient>
       <pattern id="apMeshDots" width="3.2" height="3.2" patternUnits="userSpaceOnUse">
         <circle cx="1" cy="1" r="0.7" fill="#ffffff" opacity="0.55"/>
+      </pattern>
+      <pattern id="apMaxDots" width="3" height="3" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="0.7" fill="#a99a80" opacity="0.5"/>
       </pattern>
       <filter id="apShadow" x="-40%" y="-40%" width="180%" height="180%">
         <feDropShadow dx="0" dy="3" stdDeviation="2.4" flood-color="#020617" flood-opacity="0.55"/>
@@ -229,12 +232,62 @@
 
       <!-- AirPods Max 單邊耳罩（置中 0,0） -->
       <g id="apMaxCup">
-        <rect x="-13" y="-19" width="26" height="38" rx="10" fill="url(#apMaxBody)"/>
-        <rect x="-13" y="-19" width="26" height="38" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="1"/>
-        <ellipse cx="0" cy="1" rx="8.5" ry="13" fill="url(#apMaxMesh)"/>
-        <ellipse cx="0" cy="1" rx="8.5" ry="13" fill="url(#apMeshDots)" opacity="0.8"/>
-        <rect x="-3" y="-29" width="6" height="12" rx="2" fill="url(#apSilver)"/>
-        <ellipse cx="-6" cy="-8" rx="2.6" ry="6.5" fill="#ffffff" opacity="0.35"/>
+        <ellipse cx="0" cy="2" rx="15" ry="20" fill="url(#apMaxBody)"/>
+        <ellipse cx="0" cy="2" rx="15" ry="20" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1"/>
+        <ellipse cx="0" cy="3" rx="10" ry="14.5" fill="url(#apMaxMesh)"/>
+        <ellipse cx="0" cy="3" rx="10" ry="14.5" fill="url(#apMaxDots)" opacity="0.7"/>
+        <ellipse cx="-4" cy="-2" rx="5.5" ry="8.5" fill="#ffffff" opacity="0.28"/>
+        <circle cx="6.5" cy="-11" r="2" fill="#f5eee1" stroke="#c9b89d" stroke-width="0.7"/>
+        <rect x="-2.3" y="-30" width="4.6" height="12" rx="2" fill="url(#apSilver)"/>
+      </g>
+
+      <!-- Sony 專用漸層（黑 + 銅） -->
+      <radialGradient id="sonyCup" cx="0.36" cy="0.3" r="0.72">
+        <stop offset="0" stop-color="#515863"/>
+        <stop offset="0.55" stop-color="#22262c"/>
+        <stop offset="1" stop-color="#0b0d10"/>
+      </radialGradient>
+      <radialGradient id="sonyBud" cx="0.36" cy="0.28" r="0.74">
+        <stop offset="0" stop-color="#565d67"/>
+        <stop offset="0.5" stop-color="#1b1e23"/>
+        <stop offset="1" stop-color="#0a0c0f"/>
+      </radialGradient>
+      <linearGradient id="sonyBandG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#4a5058"/>
+        <stop offset="0.5" stop-color="#23272d"/>
+        <stop offset="1" stop-color="#0c0e11"/>
+      </linearGradient>
+      <linearGradient id="sonyCopper" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f2cfa6"/>
+        <stop offset="0.5" stop-color="#cf8b43"/>
+        <stop offset="1" stop-color="#8a5a24"/>
+      </linearGradient>
+
+      <!-- Sony WH 單邊耳罩（置中 0,0） -->
+      <g id="sonyWhCup">
+        <rect x="-15" y="-17" width="30" height="34" rx="15" fill="url(#sonyCup)"/>
+        <rect x="-15" y="-17" width="30" height="34" rx="15" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1"/>
+        <circle cx="0" cy="1" r="9.5" fill="none" stroke="#000000" stroke-opacity="0.45" stroke-width="1.2"/>
+        <circle cx="0" cy="1" r="5.5" fill="#0a0c10" fill-opacity="0.55"/>
+        <rect x="-2.6" y="-27" width="5.2" height="11" rx="2.4" fill="url(#sonyBandG)"/>
+        <circle cx="0" cy="-22" r="1.5" fill="url(#sonyCopper)"/>
+        <ellipse cx="-6" cy="-9" rx="3.4" ry="7" fill="#ffffff" opacity="0.18"/>
+      </g>
+
+      <!-- Sony WF 單耳（置中 0,0） -->
+      <g id="sonyWfBud">
+        <ellipse cx="0" cy="0" rx="12.5" ry="14.5" fill="url(#sonyBud)"/>
+        <ellipse cx="9" cy="3" rx="5.5" ry="7" fill="url(#sonyBud)"/>
+        <ellipse cx="0" cy="0" rx="12.5" ry="14.5" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1"/>
+        <ellipse cx="9" cy="3" rx="5.5" ry="7" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+        <ellipse cx="-4.5" cy="-6" rx="4" ry="3" fill="#ffffff" opacity="0.32"/>
+        <circle cx="-3" cy="7" r="2.6" fill="url(#sonyCopper)"/>
+        <circle cx="-3" cy="7" r="1.1" fill="#3a2410" opacity="0.5"/>
+      </g>
+
+      <g id="sonyWfPair">
+        <g transform="translate(31 47)"><use href="#sonyWfBud"/></g>
+        <g transform="translate(65 47) scale(-1 1)"><use href="#sonyWfBud"/></g>
       </g>
     </defs>
   </svg>
@@ -477,14 +530,29 @@
       if (e.target.files.length) handleFile(e.target.files[0]);
     });
 
+    // Sony XM 系列偵測（WH-1000XM 頭戴 / WF-1000XM 真無線）
+    function detectSony(modelCode, devName, mfg) {
+      const s = (modelCode + ' ' + devName + ' ' + mfg).toUpperCase();
+      const over = /\bWH-?\s?1000\s?XM\s?(\d)\b/.exec(s);
+      if (over) return { label: 'Sony WH-1000XM' + over[1], model: 'Sony WH-1000XM' + over[1], family: 'sony-wh' };
+      const ear = /\bWF-?\s?1000\s?XM\s?(\d)\b/.exec(s);
+      if (ear) return { label: 'Sony WF-1000XM' + ear[1], model: 'Sony WF-1000XM' + ear[1], family: 'sony-wf' };
+      // 只有「1000XM4」字樣（無 WH/WF 前綴）→ 當頭戴
+      const any = /\b1000\s?XM\s?(\d)\b/.exec(s);
+      if (any) return { label: 'Sony WH-1000XM' + any[1], model: 'Sony WH-1000XM' + any[1], family: 'sony-wh' };
+      return null;
+    }
+
     // 從 device 字串提取 name、manufacturer、model
     function parseDeviceInfo(deviceAttr, fallbackSource) {
       if (!deviceAttr) {
+        const sony = detectSony('', fallbackSource || '', '');
         return {
-          key: 'source:' + fallbackSource,
-          displayName: fallbackSource || t('unknownDevice'),
+          key: sony ? (sony.model + '__' + (fallbackSource || sony.label)) : ('source:' + fallbackSource),
+          displayName: fallbackSource || (sony ? sony.label : t('unknownDevice')),
           modelCode: '',
-          mfg: ''
+          mfg: '',
+          sony: sony
         };
       }
 
@@ -499,16 +567,18 @@
       const modelCode = modelMatch ? modelMatch[1].trim() : '';
       const mfg = mfgMatch ? mfgMatch[1].trim() : '';
 
-      const displayName = devName || modelCode || mfg || '';
+      const sony = detectSony(modelCode, devName, mfg);
+      const displayName = devName || (sony ? sony.label : (modelCode || mfg || ''));
 
       // 用「正式型號（英文 canonical）+ 裝置名稱」做唯一分組 Key，避免左右耳（如 A2083/A2084）被拆成兩張卡，同時與語言無關
-      const canonical = MODEL_MAP[modelCode] ? MODEL_MAP[modelCode].en : (modelCode || mfg || 'other');
+      const canonical = sony ? sony.model : (MODEL_MAP[modelCode] ? MODEL_MAP[modelCode].en : (modelCode || mfg || 'other'));
       const groupKey = canonical + '__' + displayName;
 
-      return { key: groupKey, displayName, modelCode, mfg };
+      return { key: groupKey, displayName, modelCode, mfg, sony };
     }
 
     function modelLabelFor(info) {
+      if (info.sony) return info.sony.label;
       if (info.modelCode) {
         const official = MODEL_MAP[info.modelCode] ? MODEL_MAP[info.modelCode][currentLang] : t('modelPrefix', { code: info.modelCode });
         return official + ' (' + info.modelCode + ')';
@@ -519,6 +589,7 @@
 
     function displayNameFor(info) {
       if (info.displayName) return info.displayName;
+      if (info.sony) return info.sony.label;
       if (info.modelCode) {
         return MODEL_MAP[info.modelCode] ? MODEL_MAP[info.modelCode][currentLang] : t('modelPrefix', { code: info.modelCode });
       }
@@ -529,10 +600,30 @@
     const ILLUSTRATIONS = {
       airpods: `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#apShadow)"><g transform="translate(48 48) scale(0.95) translate(-48 -48)"><use href="#apRegPair"/></g></g></svg>`,
       pro: `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#apShadow)"><g transform="translate(48 48) scale(0.95) translate(-48 -48)"><use href="#apProPair"/></g></g></svg>`,
-      max: `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#apShadow)"><path d="M25 56V46A23 23 0 0 1 71 46V56" fill="none" stroke="url(#apMaxBody)" stroke-width="10" stroke-linecap="round"/><path d="M25 53V46A23 23 0 0 1 71 46V53" fill="none" stroke="url(#apMeshDots)" stroke-width="6" stroke-linecap="round" opacity="0.6"/><use href="#apMaxCup" transform="translate(25 70)"/><use href="#apMaxCup" transform="translate(71 70)"/></g></svg>`
+      max: `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g filter="url(#apShadow)">
+          <path d="M26 56V46A22 22 0 0 1 70 46V56" fill="none" stroke="url(#apMaxBody)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M26 52V46A22 22 0 0 1 70 46V52" fill="none" stroke="url(#apMaxMesh)" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
+          <ellipse cx="26" cy="72" rx="15" ry="20" fill="url(#apMaxBody)" stroke="#a8946f" stroke-opacity="0.5" stroke-width="1"/>
+          <ellipse cx="26" cy="73" rx="9.5" ry="14" fill="url(#apMaxMesh)"/>
+          <ellipse cx="26" cy="73" rx="9.5" ry="14" fill="url(#apMaxDots)" opacity="0.7"/>
+          <ellipse cx="21.5" cy="67" rx="5" ry="8" fill="#ffffff" opacity="0.3"/>
+          <circle cx="31.5" cy="61" r="2" fill="#f5eee1" stroke="#bda884" stroke-width="0.8"/>
+          <rect x="23.7" y="42" width="4.6" height="12" rx="2" fill="url(#apSilver)"/>
+          <ellipse cx="70" cy="72" rx="15" ry="20" fill="url(#apMaxBody)" stroke="#a8946f" stroke-opacity="0.5" stroke-width="1"/>
+          <ellipse cx="70" cy="73" rx="9.5" ry="14" fill="url(#apMaxMesh)"/>
+          <ellipse cx="70" cy="73" rx="9.5" ry="14" fill="url(#apMaxDots)" opacity="0.7"/>
+          <ellipse cx="74.5" cy="67" rx="5" ry="8" fill="#ffffff" opacity="0.3"/>
+          <circle cx="64.5" cy="61" r="2" fill="#f5eee1" stroke="#bda884" stroke-width="0.8"/>
+          <rect x="67.7" y="42" width="4.6" height="12" rx="2" fill="url(#apSilver)"/>
+        </g>
+      </svg>`,
+      'sony-wh': `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#apShadow)"><path d="M26 56V46A22 22 0 0 1 70 46V56" fill="none" stroke="url(#sonyBandG)" stroke-width="11" stroke-linecap="round"/><path d="M26 52V46A22 22 0 0 1 70 46V52" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/><use href="#sonyWhCup" transform="translate(26 70)"/><use href="#sonyWhCup" transform="translate(70 70)"/></g></svg>`,
+      'sony-wf': `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#apShadow)"><use href="#sonyWfPair"/></g></svg>`
     };
 
     function familyFor(info) {
+      if (info.sony) return info.sony.family;
       if (info.modelCode && MODEL_MAP[info.modelCode]) {
         const en = MODEL_MAP[info.modelCode].en;
         if (/Max/i.test(en)) return 'max';
