@@ -11,6 +11,9 @@
   - 最高記錄音量
   - 使用日期範圍
   - 取樣紀錄筆數
+  - **建議零售價（RRP）**
+  - **每小時聆聽成本**
+  - **CP 值評分（0–100）**
 
 ## 特點
 
@@ -18,6 +21,7 @@
 - 🎧 **分型號識別**：內置 Apple 耳機 Model 對照表（AirPods 1/2/3/4/5、AirPods Pro 1/2/3、AirPods Max 1/2），可分辨 AirPods Pro 第幾代（Lightning／USB-C 都分到）；亦支援 **Sony XM 系列**（WH-1000XM 頭戴、WF-1000XM 真無線）
 - 🌐 **雙語**：繁體中文（zh-HK）／ English 一鍵切換，自動偵測瀏覽器語言
 - 🧊 **Liquid Glass UI**：Tailwind CSS + 玻璃擬態（backdrop-blur、specular 高光）
+- 💰 **CP 值評分**：內置 RRP（HK$，參考值，可自行調整），以「每小時聆聽成本」換算 0–100 分，越高越抵
 - 📱 **響應式**：手機單欄、桌面多欄
 - ⚡ **串流解析**：大檔案用分塊（chunk）串流處理，唔會卡死
 

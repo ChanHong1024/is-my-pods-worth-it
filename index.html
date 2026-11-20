@@ -335,6 +335,8 @@
 
     <div id="results" class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2"></div>
 
+    <p id="priceNote" class="mx-auto mt-6 hidden max-w-xl text-center text-[11px] leading-relaxed text-white/35" data-i18n="priceNote"></p>
+
     <footer class="mt-10 flex items-center justify-center gap-2 text-xs text-white/40">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -373,7 +375,14 @@
         unknownDevice: '未知音訊裝置',
         noModel: '無硬件型號紀錄',
         otherDevice: '其他藍牙/有線耳機',
-        modelPrefix: '型號 {code}'
+        modelPrefix: '型號 {code}',
+        rrp: '建議零售價',
+        costPerHour: '每小時成本',
+        cpScore: 'CP 值評分',
+        cpNA: '未能計算',
+        perHour: '{x}/小時',
+        score: '{n}/100',
+        priceNote: 'RRP 為參考建議零售價（HK$，可自行調整）。CP 值 = 以每小時聆聽成本換算，0–100 分，越高越抵。'
       },
       en: {
         kicker: 'AirPods Listening Report',
@@ -402,7 +411,14 @@
         unknownDevice: 'Unknown audio device',
         noModel: 'No hardware model recorded',
         otherDevice: 'Other Bluetooth/wired headphones',
-        modelPrefix: 'Model {code}'
+        modelPrefix: 'Model {code}',
+        rrp: 'RRP',
+        costPerHour: 'Cost / hour',
+        cpScore: 'Value score',
+        cpNA: 'N/A',
+        perHour: '{x}/hr',
+        score: '{n}/100',
+        priceNote: 'RRP is a reference retail price in HKD (edit as needed). Value score = based on cost per listening hour, 0–100, higher is better value.'
       }
     };
 
@@ -471,6 +487,48 @@
       // AirPods Max 2
       'A3454': { 'zh-HK': 'AirPods Max 2', en: 'AirPods Max 2' }
     };
+
+    // 建議零售價 RRP（HK$，參考值，可自行調整）
+    const PRICE_APPLE = {
+      'A1523': 1288, 'A1722': 1288,
+      'A2031': 1288, 'A2032': 1288,
+      'A2564': 1499, 'A2565': 1499,
+      'A3050': 1199, 'A3053': 1199, 'A3054': 1199,
+      'A3055': 1499, 'A3056': 1499, 'A3057': 1499,
+      'A2083': 1999, 'A2084': 1999,
+      'A2698': 1899, 'A2699': 1899, 'A2931': 1899,
+      'A3047': 1899, 'A3048': 1899, 'A3049': 1899,
+      'A3063': 1999, 'A3064': 1999, 'A3065': 1999,
+      'A2096': 4599, 'A3184': 4599,
+      'A3454': null,
+      'A3531': null, 'A3532': null, 'A3533': null,
+      'A3439': null, 'A3440': null, 'A3441': null
+    };
+    const PRICE_SONY = {
+      'Sony WH-1000XM3': 2890,
+      'Sony WH-1000XM4': 2890,
+      'Sony WH-1000XM5': 3190,
+      'Sony WH-1000XM6': null,
+      'Sony WF-1000XM3': 1890,
+      'Sony WF-1000XM4': 2090,
+      'Sony WF-1000XM5': 2290
+    };
+
+    // CP 值評分：以「每小時成本」映射到 0–100（MID＝每隔多少錢一小時得 50 分）
+    const CP_MID = 5;
+
+    function priceFor(info) {
+      if (info.sony) return Object.prototype.hasOwnProperty.call(PRICE_SONY, info.sony.model) ? PRICE_SONY[info.sony.model] : null;
+      if (info.modelCode && Object.prototype.hasOwnProperty.call(PRICE_APPLE, info.modelCode)) return PRICE_APPLE[info.modelCode];
+      return null;
+    }
+
+    function cpScoreFor(price, hours) {
+      if (price == null || !(hours > 0)) return null;
+      const costPerHour = price / hours;
+      const score = Math.round(100 * CP_MID / (CP_MID + costPerHour));
+      return Math.max(0, Math.min(100, score));
+    }
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -778,6 +836,9 @@
 
       setStatus('done', { n: deviceStats.size });
 
+      const noteEl = document.getElementById('priceNote');
+      if (noteEl) noteEl.classList.remove('hidden');
+
       const sorted = Array.from(deviceStats.values()).sort((a, b) => b.totalSeconds - a.totalSeconds);
       resultsEl.innerHTML = '';
 
@@ -788,6 +849,10 @@
         const avgDb = stat.totalSeconds > 0 ? (stat.weightedDbSum / stat.totalSeconds).toFixed(1) : '0.0';
         const name = displayNameFor(stat.info);
         const model = modelLabelFor(stat.info);
+        const hoursVal = stat.totalSeconds / 3600;
+        const price = priceFor(stat.info);
+        const cpScore = cpScoreFor(price, hoursVal);
+        const costPerHour = (price != null && hoursVal > 0) ? price / hoursVal : null;
 
         const card = document.createElement('div');
         card.className = 'liquid card-in rounded-3xl p-6';
@@ -823,6 +888,21 @@
               <span class="text-white/55">${t('sampleCount')}</span>
               <span class="font-semibold">${t('records', { n: stat.count.toLocaleString(locale) })}</span>
             </div>
+          </div>
+          <div class="mt-4 space-y-2.5 border-t border-white/10 pt-4">
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('rrp')}</span>
+              <span class="font-semibold">${price != null ? 'HK$' + price.toLocaleString(locale) : '—'}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('costPerHour')}</span>
+              <span class="font-semibold">${costPerHour != null ? t('perHour', { x: 'HK$' + costPerHour.toFixed(costPerHour < 10 ? 1 : 0) }) : '—'}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('cpScore')}</span>
+              <span class="font-semibold">${cpScore != null ? t('score', { n: cpScore }) : t('cpNA')}</span>
+            </div>
+            ${cpScore != null ? `<div class="h-1.5 w-full overflow-hidden rounded-full bg-white/10"><div class="h-full rounded-full" style="width:${cpScore}%;background:linear-gradient(90deg,#38bdf8,#a78bfa)"></div></div>` : ''}
           </div>
         `;
         resultsEl.appendChild(card);
