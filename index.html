@@ -1024,7 +1024,6 @@
               zipFile.ondata = (err, data, final) => {
                 if (err) throw err;
                 processChunk(decoder.decode(data, { stream: !final }));
-                if (final) renderResults(deviceStats);
               };
               zipFile.start();
             }
@@ -1036,7 +1035,11 @@
           });
           unzipper.push(new Uint8Array(0), true);
 
-          if (!foundExportXml) {
+          if (foundExportXml) {
+            // 串流結束後統一 flush＋渲染，避免個別瀏覽器冇觸發 ondata final 而卡住
+            processChunk(decoder.decode());
+            renderResults(deviceStats);
+          } else {
             setStatus('errNoXml');
           }
         } else {
