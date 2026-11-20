@@ -15,7 +15,7 @@
 ## 特點
 
 - 🔒 **100% 本地**：所有解析都喺瀏覽器完成，資料**永不**上傳，離線都用到
-- 🎧 **分型號識別**：內置 Apple 耳機 Model 對照表（AirPods 1/2/3/4、AirPods Pro 1/2、AirPods Max）
+- 🎧 **分型號識別**：內置 Apple 耳機 Model 對照表（AirPods 1/2/3/4/5、AirPods Pro 1/2/3、AirPods Max 1/2），可分辨 AirPods Pro 第幾代（Lightning／USB-C 都分到）
 - 🌐 **雙語**：繁體中文（zh-HK）／ English 一鍵切換，自動偵測瀏覽器語言
 - 🧊 **Liquid Glass UI**：Tailwind CSS + 玻璃擬態（backdrop-blur、specular 高光）
 - 📱 **響應式**：手機單欄、桌面多欄
