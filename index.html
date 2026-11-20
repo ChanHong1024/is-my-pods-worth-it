@@ -980,8 +980,8 @@
           }
 
           const val = parseFloat(attrs.value);
-          const start = Date.parse(attrs.startDate);
-          const end = Date.parse(attrs.endDate);
+          const start = parseAppleDate(attrs.startDate);
+          const end = parseAppleDate(attrs.endDate);
 
           if (!isNaN(val) && !isNaN(start) && !isNaN(end) && end >= start) {
             const durationSec = (end - start) / 1000;
@@ -1063,6 +1063,25 @@
         setStatus('statusStreaming', { pct: pct });
         await new Promise((r) => setTimeout(r, 0));
       }
+    }
+
+    // Apple 健康日期格式 "YYYY-MM-DD HH:MM:SS +0800"：Safari 用 Date.parse 會回傳 NaN，必須自行解析
+    function parseAppleDate(s) {
+      if (!s) return NaN;
+      const str = String(s).trim();
+      const m = str.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?\s*([+-])(\d{2}):?(\d{2})?$/);
+      if (m) {
+        const ms = m[7] ? Math.round(parseFloat('0.' + m[7]) * 1000) : 0;
+        const offMin = (m[8] === '-' ? -1 : 1) * (parseInt(m[9], 10) * 60 + parseInt(m[10] || '00', 10));
+        return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6], ms) - offMin * 60000;
+      }
+      const m2 = str.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?$/);
+      if (m2) {
+        const ms = m2[7] ? Math.round(parseFloat('0.' + m2[7]) * 1000) : 0;
+        return new Date(+m2[1], +m2[2] - 1, +m2[3], +m2[4], +m2[5], +m2[6], ms).getTime();
+      }
+      const t = Date.parse(str);
+      return isNaN(t) ? NaN : t;
     }
 
     function formatDate(ts) {
