@@ -485,7 +485,20 @@
       'A2096': { 'zh-HK': 'AirPods Max（第 1 代 · Lightning）', en: 'AirPods Max (1st generation · Lightning)' },
       'A3184': { 'zh-HK': 'AirPods Max（第 1 代 · USB-C）', en: 'AirPods Max (1st generation · USB-C)' },
       // AirPods Max 2
-      'A3454': { 'zh-HK': 'AirPods Max 2', en: 'AirPods Max 2' }
+      'A3454': { 'zh-HK': 'AirPods Max 2', en: 'AirPods Max 2' },
+      // Apple 藍牙 Product ID（部分 iOS 版本以 hex 顯示）
+      '0X2002': { 'zh-HK': 'AirPods（第 1 代）', en: 'AirPods (1st generation)' },
+      '0X200F': { 'zh-HK': 'AirPods（第 2 代）', en: 'AirPods (2nd generation)' },
+      '0X2013': { 'zh-HK': 'AirPods（第 3 代）', en: 'AirPods (3rd generation)' },
+      '0X201B': { 'zh-HK': 'AirPods 4（主動消噪版）', en: 'AirPods 4 (ANC)' },
+      '0X200E': { 'zh-HK': 'AirPods Pro（第 1 代）', en: 'AirPods Pro (1st generation)' },
+      '0X2014': { 'zh-HK': 'AirPods Pro（第 2 代 · Lightning）', en: 'AirPods Pro (2nd generation · Lightning)' },
+      '0X2024': { 'zh-HK': 'AirPods Pro（第 2 代 · USB-C）', en: 'AirPods Pro (2nd generation · USB-C)' },
+      '0X202B': { 'zh-HK': 'AirPods Pro（第 3 代）', en: 'AirPods Pro (3rd generation)' },
+      '0X202C': { 'zh-HK': 'AirPods Pro（第 3 代）', en: 'AirPods Pro (3rd generation)' },
+      '0X200A': { 'zh-HK': 'AirPods Max（第 1 代 · Lightning）', en: 'AirPods Max (1st generation · Lightning)' },
+      '0X201F': { 'zh-HK': 'AirPods Max（第 1 代 · USB-C）', en: 'AirPods Max (1st generation · USB-C)' },
+      '0X202D': { 'zh-HK': 'AirPods Max 2', en: 'AirPods Max 2' }
     };
 
     // 建議零售價 RRP（HK$，參考值，可自行調整）
@@ -502,7 +515,11 @@
       'A2096': 4599, 'A3184': 4599,
       'A3454': null,
       'A3531': null, 'A3532': null, 'A3533': null,
-      'A3439': null, 'A3440': null, 'A3441': null
+      'A3439': null, 'A3440': null, 'A3441': null,
+      // Apple 藍牙 Product ID（hex）
+      '0X2002': 1288, '0X200F': 1288, '0X2013': 1499, '0X201B': 1499,
+      '0X200E': 1999, '0X2014': 1899, '0X2024': 1899, '0X202B': 1999, '0X202C': 1999,
+      '0X200A': 4599, '0X201F': 4599, '0X202D': null
     };
     const PRICE_SONY = {
       'Sony WH-1000XM3': 2890,
@@ -519,7 +536,8 @@
 
     function priceFor(info) {
       if (info.sony) return Object.prototype.hasOwnProperty.call(PRICE_SONY, info.sony.model) ? PRICE_SONY[info.sony.model] : null;
-      if (info.modelCode && Object.prototype.hasOwnProperty.call(PRICE_APPLE, info.modelCode)) return PRICE_APPLE[info.modelCode];
+      if (info.modelKey && Object.prototype.hasOwnProperty.call(PRICE_APPLE, info.modelKey)) return PRICE_APPLE[info.modelKey];
+      if (/earpods/i.test(info.displayName || '')) return 149;
       return null;
     }
 
@@ -614,6 +632,7 @@
           key: sony ? (sony.model + '__' + (fallbackSource || sony.label)) : ('source:' + fallbackSource),
           displayName: fallbackSource || (sony ? sony.label : t('unknownDevice')),
           modelCode: '',
+          modelKey: '',
           mfg: '',
           sony: sony
         };
@@ -629,23 +648,26 @@
       const devName = nameMatch ? nameMatch[1].trim() : '';
       const modelCode = modelMatch ? modelMatch[1].trim() : '';
       const mfg = mfgMatch ? mfgMatch[1].trim() : '';
+      const modelKey = modelCode ? modelCode.toUpperCase() : '';
 
       const sony = detectSony(modelCode, devName, mfg);
       const displayName = devName || (sony ? sony.label : (modelCode || mfg || ''));
 
       // 用「正式型號（英文 canonical）+ 裝置名稱」做唯一分組 Key，避免左右耳（如 A2083/A2084）被拆成兩張卡，同時與語言無關
-      const canonical = sony ? sony.model : (MODEL_MAP[modelCode] ? MODEL_MAP[modelCode].en : (modelCode || mfg || 'other'));
+      const canonical = sony ? sony.model : (MODEL_MAP[modelKey] ? MODEL_MAP[modelKey].en : (modelCode || mfg || 'other'));
       const groupKey = canonical + '__' + displayName;
 
-      return { key: groupKey, displayName, modelCode, mfg, sony };
+      return { key: groupKey, displayName, modelCode, modelKey, mfg, sony };
     }
 
     function modelLabelFor(info) {
       if (info.sony) return info.sony.label;
       if (info.modelCode) {
-        const official = MODEL_MAP[info.modelCode] ? MODEL_MAP[info.modelCode][currentLang] : t('modelPrefix', { code: info.modelCode });
+        const known = info.modelKey && MODEL_MAP[info.modelKey];
+        const official = known ? MODEL_MAP[info.modelKey][currentLang] : t('modelPrefix', { code: info.modelCode });
         return official + ' (' + info.modelCode + ')';
       }
+      if (/earpods/i.test(info.displayName || '')) return 'Apple EarPods';
       if (info.mfg) return info.mfg;
       return t('otherDevice');
     }
@@ -653,9 +675,8 @@
     function displayNameFor(info) {
       if (info.displayName) return info.displayName;
       if (info.sony) return info.sony.label;
-      if (info.modelCode) {
-        return MODEL_MAP[info.modelCode] ? MODEL_MAP[info.modelCode][currentLang] : t('modelPrefix', { code: info.modelCode });
-      }
+      if (info.modelKey && MODEL_MAP[info.modelKey]) return MODEL_MAP[info.modelKey][currentLang];
+      if (info.modelCode) return t('modelPrefix', { code: info.modelCode });
       return t('otherDevice');
     }
 
@@ -693,8 +714,8 @@
 
     function familyFor(info) {
       if (info.sony) return info.sony.family;
-      if (info.modelCode && MODEL_MAP[info.modelCode]) {
-        const en = MODEL_MAP[info.modelCode].en;
+      if (info.modelKey && MODEL_MAP[info.modelKey]) {
+        const en = MODEL_MAP[info.modelKey].en;
         if (/Max/i.test(en)) return 'max';
         if (/Pro/i.test(en)) return 'pro';
       }
