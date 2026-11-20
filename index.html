@@ -158,6 +158,20 @@
       .illu, .illu::after, .card-in { animation: none !important; }
       .illu svg { transition: none; }
     }
+
+    /* 分享圖設定彈窗 */
+    .seg-btn {
+      color: rgba(255, 255, 255, 0.6);
+      transition: background .2s, color .2s;
+    }
+    .seg-btn.active {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+    .share-check {
+      accent-color: #38bdf8;
+    }
   </style>
 </head>
 <body class="min-h-screen text-white">
@@ -355,6 +369,84 @@
     </footer>
   </main>
 
+  <div id="shareModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6" aria-hidden="true">
+    <div id="shareBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="shareModalTitle" class="liquid relative z-10 flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[1.75rem] p-5 sm:p-7">
+      <div class="flex items-center justify-between gap-4">
+        <h2 id="shareModalTitle" class="text-lg font-bold sm:text-xl" data-i18n="shareModalTitle">分享圖設定</h2>
+        <button id="shareClose" class="liquid-soft flex h-9 w-9 items-center justify-center rounded-full text-white/70 hover:text-white" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="mt-4 grid min-h-0 flex-1 grid-cols-1 gap-5 overflow-hidden lg:grid-cols-2">
+        <div class="flex min-h-0 items-center justify-center overflow-hidden rounded-2xl bg-black/20 p-3">
+          <img id="sharePreview" alt="" class="max-h-[38vh] max-w-full rounded-xl object-contain shadow-2xl lg:max-h-[60vh]" />
+        </div>
+
+        <div class="min-h-0 space-y-4 overflow-y-auto pr-1">
+          <div>
+            <div class="mb-1.5 text-xs font-medium uppercase tracking-wide text-white/45" data-i18n="ratioLabel">比例</div>
+            <div id="ratioGroup" class="liquid-soft inline-flex rounded-full p-1" role="group">
+              <button data-ratio="4:5" class="seg-btn rounded-full px-3 py-1.5 text-sm">4:5</button>
+              <button data-ratio="1:1" class="seg-btn rounded-full px-3 py-1.5 text-sm">1:1</button>
+              <button data-ratio="9:16" class="seg-btn rounded-full px-3 py-1.5 text-sm">9:16</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="mb-1.5 text-xs font-medium uppercase tracking-wide text-white/45" data-i18n="themeLabel">主題</div>
+            <div id="themeGroup" class="liquid-soft inline-flex rounded-full p-1" role="group">
+              <button data-theme="dark" class="seg-btn rounded-full px-3 py-1.5 text-sm" data-i18n="themeDark">深色</button>
+              <button data-theme="light" class="seg-btn rounded-full px-3 py-1.5 text-sm" data-i18n="themeLight">淺色</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="mb-1.5 text-xs font-medium uppercase tracking-wide text-white/45" data-i18n="sortLabel">排序</div>
+            <div id="sortGroup" class="liquid-soft inline-flex rounded-full p-1" role="group">
+              <button data-sort="time" class="seg-btn rounded-full px-3 py-1.5 text-sm" data-i18n="sortTime">聆聽時間</button>
+              <button data-sort="cp" class="seg-btn rounded-full px-3 py-1.5 text-sm" data-i18n="sortCp">CP 值</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-3 text-sm">
+            <span class="text-white/70" data-i18n="showCostLabel">顯示每小時成本</span>
+            <label class="relative inline-flex cursor-pointer items-center">
+              <input type="checkbox" id="showCostToggle" class="peer sr-only" checked />
+              <span class="h-6 w-11 rounded-full bg-white/15 transition peer-checked:bg-cyan-400/80"></span>
+              <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition peer-checked:translate-x-5"></span>
+            </label>
+          </div>
+
+          <div>
+            <label for="shareTitleInput" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/45" data-i18n="titleLabel">標題</label>
+            <input id="shareTitleInput" type="text" maxlength="40" class="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-cyan-300/60 focus:outline-none" />
+          </div>
+
+          <div>
+            <div class="mb-1.5 flex items-center justify-between">
+              <span class="text-xs font-medium uppercase tracking-wide text-white/45" data-i18n="devicesLabel">裝置</span>
+              <div class="flex gap-3 text-xs">
+                <button id="selAll" class="text-cyan-200/80 hover:text-cyan-200" data-i18n="selectAll">全選</button>
+                <button id="selNone" class="text-white/50 hover:text-white/80" data-i18n="selectNone">清除</button>
+              </div>
+            </div>
+            <div id="deviceList" class="space-y-1.5"></div>
+          </div>
+
+          <p id="shareWarn" class="hidden text-xs text-amber-300/90" data-i18n="noDeviceSelected">請最少揀一部裝置</p>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-white/10 pt-4">
+        <button id="shareCancel" class="rounded-full px-4 py-2 text-sm text-white/70 hover:text-white" data-i18n="cancel">取消</button>
+        <button id="shareDownload" class="liquid-soft rounded-full px-4 py-2 text-sm font-semibold text-white" data-i18n="download">下載 PNG</button>
+        <button id="shareDo" class="btn-glass rounded-full px-5 py-2 text-sm font-semibold" data-i18n="share">分享…</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ===== i18n =====
     const STRINGS = {
@@ -399,7 +491,24 @@
         shareKicker: 'AIRPODS LISTENING REPORT',
         shareSubtitle: '{n} 款耳機 · 100% 本地解析',
         shareFooter: 'Is my Pods Worth It? · 100% 本地解析 · chanhong1024.github.io/is-my-pods-worth-it',
-        shareNoPrice: '未能計算'
+        shareNoPrice: '未能計算',
+        shareModalTitle: '分享圖設定',
+        ratioLabel: '比例',
+        themeLabel: '主題',
+        themeDark: '深色',
+        themeLight: '淺色',
+        sortLabel: '排序',
+        sortTime: '聆聽時間',
+        sortCp: 'CP 值',
+        showCostLabel: '顯示每小時成本',
+        titleLabel: '標題',
+        devicesLabel: '裝置',
+        selectAll: '全選',
+        selectNone: '清除',
+        cancel: '取消',
+        download: '下載 PNG',
+        share: '分享…',
+        noDeviceSelected: '請最少揀一部裝置'
       },
       en: {
         kicker: 'AirPods Listening Report',
@@ -442,7 +551,24 @@
         shareKicker: 'AIRPODS LISTENING REPORT',
         shareSubtitle: '{n} devices · 100% local',
         shareFooter: 'Is my Pods Worth It? · 100% local · chanhong1024.github.io/is-my-pods-worth-it',
-        shareNoPrice: 'N/A'
+        shareNoPrice: 'N/A',
+        shareModalTitle: 'Share image settings',
+        ratioLabel: 'Ratio',
+        themeLabel: 'Theme',
+        themeDark: 'Dark',
+        themeLight: 'Light',
+        sortLabel: 'Sort',
+        sortTime: 'Listening time',
+        sortCp: 'CP score',
+        showCostLabel: 'Show cost / hour',
+        titleLabel: 'Title',
+        devicesLabel: 'Devices',
+        selectAll: 'Select all',
+        selectNone: 'Clear',
+        cancel: 'Cancel',
+        download: 'Download PNG',
+        share: 'Share…',
+        noDeviceSelected: 'Select at least one device'
       }
     };
 
@@ -615,6 +741,11 @@
       localStorage.setItem('lang', lang);
       applyStaticTexts();
       if (lastDeviceStats) renderResults(lastDeviceStats);
+      const modalEl = document.getElementById('shareModal');
+      if (modalEl && !modalEl.classList.contains('hidden')) {
+        buildDeviceList();
+        updateSharePreview();
+      }
     }
 
     langZh.addEventListener('click', () => setLang('zh-HK'));
@@ -1003,8 +1134,27 @@
       setTimeout(() => URL.revokeObjectURL(url), 1500);
     }
 
-    function drawShareCard(ctx, W, H, items) {
-      const locale = currentLang === 'zh-HK' ? 'zh-HK' : 'en';
+    function drawShareCard(ctx, W, H, items, opts) {
+      opts = opts || {};
+      const dark = opts.theme !== 'light';
+      const P = dark ? {
+        bg1: '#0a0d14', bg2: '#0c1018',
+        g1: 'rgba(56,189,248,0.30)', g2: 'rgba(139,92,246,0.30)', g3: 'rgba(236,72,153,0.22)',
+        text: '#ffffff', muted: 'rgba(255,255,255,0.55)', faint: 'rgba(255,255,255,0.42)',
+        kicker: 'rgba(165,243,252,0.8)', model: 'rgba(165,243,252,0.85)',
+        panel: 'rgba(255,255,255,0.06)', panelStroke: 'rgba(255,255,255,0.12)', hiTop: 'rgba(255,255,255,0.12)',
+        sep: 'rgba(255,255,255,0.08)', track: 'rgba(255,255,255,0.10)', best: '#7dd3fc', cp: '#ffffff'
+      } : {
+        bg1: '#eef2f7', bg2: '#dbe4ef',
+        g1: 'rgba(56,189,248,0.24)', g2: 'rgba(139,92,246,0.20)', g3: 'rgba(244,114,182,0.16)',
+        text: '#0b1220', muted: 'rgba(15,23,42,0.55)', faint: 'rgba(15,23,42,0.45)',
+        kicker: 'rgba(2,132,199,0.85)', model: 'rgba(2,132,199,0.9)',
+        panel: 'rgba(255,255,255,0.62)', panelStroke: 'rgba(15,23,42,0.10)', hiTop: 'rgba(255,255,255,0.7)',
+        sep: 'rgba(15,23,42,0.08)', track: 'rgba(15,23,42,0.10)', best: '#0284c7', cp: '#0b1220'
+      };
+      const showCost = !!opts.showCost;
+      const title = (opts.title && opts.title.trim()) ? opts.title.trim() : 'Is my Pods Worth It?';
+
       const setFont = (size, weight) => { ctx.font = `${weight || 700} ${size}px ${SHARE_FONT}`; };
       const roundRect = (x, y, w, h, r) => {
         ctx.beginPath();
@@ -1031,39 +1181,39 @@
       };
 
       const bg = ctx.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, '#0a0d14');
-      bg.addColorStop(1, '#0c1018');
+      bg.addColorStop(0, P.bg1);
+      bg.addColorStop(1, P.bg2);
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
-      glow(W * 0.1, H * 0.06, 640, 'rgba(56,189,248,0.30)');
-      glow(W * 0.98, H * 0.2, 560, 'rgba(139,92,246,0.30)');
-      glow(W * 0.5, H * 1.02, 720, 'rgba(236,72,153,0.22)');
+      glow(W * 0.1, H * 0.06, 640, P.g1);
+      glow(W * 0.98, H * 0.2, 560, P.g2);
+      glow(W * 0.5, H * 1.02, 720, P.g3);
 
       const padX = 72;
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = 'left';
 
       setFont(26, 600);
-      ctx.fillStyle = 'rgba(165,243,252,0.8)';
+      ctx.fillStyle = P.kicker;
       ctx.fillText(t('shareKicker'), padX, 112);
 
-      setFont(78, 800);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('Is my Pods Worth It?', padX, 198);
+      setFont(76, 800);
+      ctx.fillStyle = P.text;
+      ctx.fillText(truncate(title, W - padX * 2), padX, 196);
 
       setFont(30, 500);
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillText(t('shareSubtitle', { n: items.length }), padX, 250);
+      ctx.fillStyle = P.muted;
+      ctx.fillText(t('shareSubtitle', { n: items.length }), padX, 246);
 
-      const px = padX, py = 300, pw = W - padX * 2, ph = H - py - 120;
+      const px = padX, py = 296, pw = W - padX * 2, ph = H - py - 116;
       roundRect(px, py, pw, ph, 40);
-      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillStyle = P.panel;
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.strokeStyle = P.panelStroke;
       ctx.lineWidth = 2;
       ctx.stroke();
       const hi = ctx.createLinearGradient(0, py, 0, py + 120);
-      hi.addColorStop(0, 'rgba(255,255,255,0.12)');
+      hi.addColorStop(0, P.hiTop);
       hi.addColorStop(1, 'rgba(255,255,255,0)');
       roundRect(px, py, pw, ph, 40);
       ctx.fillStyle = hi;
@@ -1071,109 +1221,263 @@
 
       const inX = px + 44;
       const inR = px + pw - 44;
-      const listTop = py + 36;
-      const avail = ph - 64;
-      const n = items.length;
-      const cap = n <= 2 ? 210 : n <= 4 ? 170 : n <= 6 ? 145 : 118;
-      const rowH = Math.min(cap, avail / n);
-      const startY = listTop + Math.max(0, (avail - rowH * n) / 2);
 
-      let bestIdx = -1, bestCp = -1;
-      items.forEach((it, i) => { if (it.cpScore != null && it.cpScore > bestCp) { bestCp = it.cpScore; bestIdx = i; } });
-
-      const showModel = rowH >= 96;
-      const showHours = rowH >= 84;
-      const showBar = rowH >= 118;
-      const nameFont = rowH >= 130 ? 40 : rowH >= 100 ? 34 : 28;
-      const modelFont = Math.max(18, Math.round(nameFont * 0.58));
-      const cpFont = rowH >= 130 ? 54 : rowH >= 100 ? 44 : 34;
-      const smallFont = rowH >= 100 ? 24 : 20;
-      const barW = inR - inX;
-      const nameMaxW = barW - cpFont * 2.2 - 24;
-
-      ctx.textBaseline = 'middle';
-      items.forEach((it, i) => {
-        const y0 = startY + i * rowH;
-        const midY = y0 + rowH / 2;
-
+      if (!items.length) {
+        ctx.textAlign = 'center';
+        setFont(34, 600);
+        ctx.fillStyle = P.muted;
+        ctx.fillText(t('noDeviceSelected'), px + pw / 2, py + ph / 2);
         ctx.textAlign = 'left';
-        setFont(nameFont, 800);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(truncate(it.name, nameMaxW), inX, midY - (showModel ? 13 : 0));
+      } else {
+        const listTop = py + 34;
+        const avail = ph - 60;
+        const n = items.length;
+        const cap = n <= 2 ? 200 : n <= 4 ? 165 : n <= 6 ? 140 : 116;
+        const rowH = Math.min(cap, avail / n);
+        const startY = listTop + Math.max(0, (avail - rowH * n) / 2);
 
-        if (showModel) {
-          setFont(modelFont, 500);
-          ctx.fillStyle = 'rgba(165,243,252,0.85)';
-          ctx.fillText(truncate(it.model, nameMaxW), inX, midY + 20);
-        }
+        let bestIdx = -1, bestCp = -1;
+        items.forEach((it, i) => { if (it.cpScore != null && it.cpScore > bestCp) { bestCp = it.cpScore; bestIdx = i; } });
 
-        const cpY = midY - (showHours ? 11 : 0);
-        ctx.textAlign = 'right';
-        if (it.cpScore != null) {
-          setFont(cpFont, 800);
-          ctx.fillStyle = (i === bestIdx) ? '#7dd3fc' : '#ffffff';
-          ctx.fillText(String(it.cpScore), inR - 44, cpY);
-          setFont(Math.round(smallFont * 0.8), 600);
-          ctx.fillStyle = 'rgba(255,255,255,0.5)';
-          ctx.fillText('/100', inR, cpY + cpFont * 0.16);
-        } else {
-          setFont(Math.round(cpFont * 0.7), 700);
-          ctx.fillStyle = 'rgba(255,255,255,0.45)';
-          ctx.fillText('—', inR, cpY);
-        }
+        const showModel = rowH >= 92;
+        const showHours = rowH >= 80;
+        const showBar = rowH >= 112;
+        const showCostLine = showCost && rowH >= 120;
+        const nameFont = rowH >= 126 ? 40 : rowH >= 96 ? 34 : 28;
+        const modelFont = Math.max(18, Math.round(nameFont * 0.58));
+        const costFont = Math.max(17, Math.round(nameFont * 0.55));
+        const cpFont = rowH >= 126 ? 52 : rowH >= 96 ? 42 : 32;
+        const smallFont = rowH >= 96 ? 23 : 19;
+        const barW = inR - inX;
+        const nameMaxW = barW - cpFont * 2.2 - 24;
 
-        if (showHours) {
-          setFont(smallFont, 600);
-          ctx.fillStyle = 'rgba(255,255,255,0.5)';
-          ctx.fillText(t('hours', { h: it.hours.toFixed(1) }), inR, midY + 21);
-        }
+        ctx.textBaseline = 'middle';
+        items.forEach((it, i) => {
+          const y0 = startY + i * rowH;
+          const midY = y0 + rowH / 2;
 
-        if (showBar) {
-          const barY = y0 + rowH - 18;
-          roundRect(inX, barY, barW, 8, 4);
-          ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.fill();
-          if (it.cpScore != null) {
-            const g = ctx.createLinearGradient(inX, 0, inR, 0);
-            g.addColorStop(0, '#38bdf8'); g.addColorStop(1, '#a78bfa');
-            roundRect(inX, barY, Math.max(8, barW * it.cpScore / 100), 8, 4);
-            ctx.fillStyle = g; ctx.fill();
+          ctx.textAlign = 'left';
+          let nameY = midY, modelY = midY, costY = midY;
+          if (showModel && showCostLine) { nameY = midY - 30; modelY = midY; costY = midY + 30; }
+          else if (showModel) { nameY = midY - 13; modelY = midY + 20; }
+
+          setFont(nameFont, 800);
+          ctx.fillStyle = P.text;
+          ctx.fillText(truncate(it.name, nameMaxW), inX, nameY);
+
+          if (showModel) {
+            setFont(modelFont, 500);
+            ctx.fillStyle = P.model;
+            ctx.fillText(truncate(it.model, nameMaxW), inX, modelY);
           }
-        }
+          if (showCostLine) {
+            setFont(costFont, 500);
+            ctx.fillStyle = P.muted;
+            const costTxt = it.costPerHour != null ? t('perHour', { x: 'HK$' + it.costPerHour.toFixed(it.costPerHour < 10 ? 1 : 0) }) : '—';
+            ctx.fillText(costTxt, inX, costY);
+          }
 
-        if (i < n - 1) {
-          ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath(); ctx.moveTo(inX, y0 + rowH); ctx.lineTo(inR, y0 + rowH); ctx.stroke();
-        }
-      });
+          const cpY = midY - (showHours ? 11 : 0);
+          ctx.textAlign = 'right';
+          if (it.cpScore != null) {
+            setFont(cpFont, 800);
+            ctx.fillStyle = (i === bestIdx) ? P.best : P.cp;
+            ctx.fillText(String(it.cpScore), inR - 44, cpY);
+            setFont(Math.round(smallFont * 0.8), 600);
+            ctx.fillStyle = P.muted;
+            ctx.fillText('/100', inR, cpY + cpFont * 0.16);
+          } else {
+            setFont(Math.round(cpFont * 0.7), 700);
+            ctx.fillStyle = P.muted;
+            ctx.fillText('—', inR, cpY);
+          }
+
+          if (showHours) {
+            setFont(smallFont, 600);
+            ctx.fillStyle = P.muted;
+            ctx.fillText(t('hours', { h: it.hours.toFixed(1) }), inR, midY + 21);
+          }
+
+          if (showBar) {
+            const barY = y0 + rowH - 16;
+            roundRect(inX, barY, barW, 8, 4);
+            ctx.fillStyle = P.track; ctx.fill();
+            if (it.cpScore != null) {
+              const g = ctx.createLinearGradient(inX, 0, inR, 0);
+              g.addColorStop(0, '#38bdf8'); g.addColorStop(1, '#a78bfa');
+              roundRect(inX, barY, Math.max(8, barW * it.cpScore / 100), 8, 4);
+              ctx.fillStyle = g; ctx.fill();
+            }
+          }
+
+          if (i < n - 1) {
+            ctx.strokeStyle = P.sep;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(inX, y0 + rowH); ctx.lineTo(inR, y0 + rowH); ctx.stroke();
+          }
+        });
+      }
 
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = 'center';
-      setFont(24, 500);
-      ctx.fillStyle = 'rgba(255,255,255,0.42)';
-      ctx.fillText(t('shareFooter'), W / 2, H - 52, W - padX * 2);
+      setFont(23, 500);
+      ctx.fillStyle = P.faint;
+      ctx.fillText(t('shareFooter'), W / 2, H - 48, W - padX * 2);
       ctx.textAlign = 'left';
     }
 
-    function shareCard() {
-      if (!lastShareData || !lastShareData.length) return;
-      const W = 1080, H = 1350;
+    // ===== 分享圖設定 Popup =====
+    const RATIO_DIMS = { '4:5': [1080, 1350], '1:1': [1080, 1080], '9:16': [1080, 1920] };
+    const shareCfg = { ratio: '4:5', theme: 'dark', showCost: true, sort: 'time', selected: new Set(), title: 'Is my Pods Worth It?' };
+
+    const shareModal = document.getElementById('shareModal');
+    const sharePreviewImg = document.getElementById('sharePreview');
+    const deviceListEl = document.getElementById('deviceList');
+    const shareWarnEl = document.getElementById('shareWarn');
+    const shareTitleInput = document.getElementById('shareTitleInput');
+    const showCostToggle = document.getElementById('showCostToggle');
+    const shareDownloadBtn = document.getElementById('shareDownload');
+    const shareDoBtn = document.getElementById('shareDo');
+
+    let previewRaf = 0;
+    function schedulePreview() {
+      if (previewRaf) return;
+      previewRaf = requestAnimationFrame(() => { previewRaf = 0; updateSharePreview(); });
+    }
+
+    function getShareItems() {
+      if (!lastShareData) return [];
+      let arr = lastShareData.filter((_, i) => shareCfg.selected.has(i));
+      if (shareCfg.sort === 'cp') {
+        arr = arr.slice().sort((a, b) => (b.cpScore == null ? -1 : b.cpScore) - (a.cpScore == null ? -1 : a.cpScore));
+      }
+      return arr;
+    }
+
+    function updateSharePreview() {
+      const items = getShareItems();
+      const dims = RATIO_DIMS[shareCfg.ratio] || RATIO_DIMS['4:5'];
       const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
-      drawShareCard(canvas.getContext('2d'), W, H, lastShareData);
-      const blob = dataURLToBlob(canvas.toDataURL('image/png'));
-      const file = new File([blob], 'is-my-pods-worth-it.png', { type: 'image/png' });
+      canvas.width = dims[0];
+      canvas.height = dims[1];
+      drawShareCard(canvas.getContext('2d'), dims[0], dims[1], items, {
+        theme: shareCfg.theme, showCost: shareCfg.showCost, title: shareCfg.title
+      });
+      if (sharePreviewImg) sharePreviewImg.src = canvas.toDataURL('image/png');
+      const empty = items.length === 0;
+      if (shareWarnEl) shareWarnEl.classList.toggle('hidden', !empty);
+      [shareDownloadBtn, shareDoBtn].forEach((b) => { if (b) { b.disabled = empty; b.style.opacity = empty ? '0.5' : ''; } });
+    }
+
+    function setSeg(groupId, attr, value) {
+      const group = document.getElementById(groupId);
+      if (!group) return;
+      group.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('active', b.getAttribute('data-' + attr) === value));
+    }
+    function syncSegs() {
+      setSeg('ratioGroup', 'ratio', shareCfg.ratio);
+      setSeg('themeGroup', 'theme', shareCfg.theme);
+      setSeg('sortGroup', 'sort', shareCfg.sort);
+    }
+
+    function buildDeviceList() {
+      if (!deviceListEl) return;
+      deviceListEl.innerHTML = '';
+      (lastShareData || []).forEach((it, i) => {
+        const row = document.createElement('label');
+        row.className = 'flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm hover:bg-white/5';
+        row.innerHTML = `<input type="checkbox" class="share-check h-4 w-4 rounded" ${shareCfg.selected.has(i) ? 'checked' : ''}>
+          <span class="min-w-0"><span class="block truncate text-white/90">${escapeHtml(it.name)}</span><span class="block truncate text-xs text-white/45">${escapeHtml(it.model)}</span></span>`;
+        const input = row.querySelector('input');
+        input.addEventListener('change', () => {
+          if (input.checked) shareCfg.selected.add(i); else shareCfg.selected.delete(i);
+          schedulePreview();
+        });
+        deviceListEl.appendChild(row);
+      });
+    }
+
+    function openShareModal() {
+      if (!lastShareData || !lastShareData.length) return;
+      shareCfg.ratio = '4:5';
+      shareCfg.theme = 'dark';
+      shareCfg.showCost = true;
+      shareCfg.sort = 'time';
+      shareCfg.title = t('h1') || 'Is my Pods Worth It?';
+      shareCfg.selected = new Set(lastShareData.map((_, i) => i));
+      if (shareTitleInput) shareTitleInput.value = shareCfg.title;
+      if (showCostToggle) showCostToggle.checked = true;
+      syncSegs();
+      buildDeviceList();
+      shareModal.classList.remove('hidden');
+      shareModal.classList.add('flex');
+      shareModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      updateSharePreview();
+      const closeBtn = document.getElementById('shareClose');
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeShareModal() {
+      shareModal.classList.add('hidden');
+      shareModal.classList.remove('flex');
+      shareModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      const btn = document.getElementById('shareBtn');
+      if (btn) btn.focus();
+    }
+
+    function renderShareCanvas() {
+      const dims = RATIO_DIMS[shareCfg.ratio] || RATIO_DIMS['4:5'];
+      const canvas = document.createElement('canvas');
+      canvas.width = dims[0];
+      canvas.height = dims[1];
+      drawShareCard(canvas.getContext('2d'), dims[0], dims[1], getShareItems(), {
+        theme: shareCfg.theme, showCost: shareCfg.showCost, title: shareCfg.title
+      });
+      return canvas;
+    }
+
+    function shareFileName() {
+      return 'is-my-pods-worth-it-' + shareCfg.ratio.replace(':', 'x') + '.png';
+    }
+
+    function doDownload() {
+      if (!getShareItems().length) return;
+      const blob = dataURLToBlob(renderShareCanvas().toDataURL('image/png'));
+      downloadBlob(blob, shareFileName());
+    }
+
+    function doShare() {
+      if (!getShareItems().length) return;
+      const blob = dataURLToBlob(renderShareCanvas().toDataURL('image/png'));
+      const file = new File([blob], shareFileName(), { type: 'image/png' });
       const shareText = t('shareText');
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], text: shareText, title: 'Is my Pods Worth It?' })
-          .catch(() => downloadBlob(blob, 'is-my-pods-worth-it.png'));
+          .catch(() => downloadBlob(blob, shareFileName()));
       } else {
-        downloadBlob(blob, 'is-my-pods-worth-it.png');
+        downloadBlob(blob, shareFileName());
       }
     }
 
     const shareBtnEl = document.getElementById('shareBtn');
-    if (shareBtnEl) shareBtnEl.addEventListener('click', shareCard);
+    if (shareBtnEl) shareBtnEl.addEventListener('click', openShareModal);
+    document.getElementById('shareClose')?.addEventListener('click', closeShareModal);
+    document.getElementById('shareCancel')?.addEventListener('click', closeShareModal);
+    document.getElementById('shareBackdrop')?.addEventListener('click', closeShareModal);
+    document.getElementById('ratioGroup')?.querySelectorAll('.seg-btn').forEach((b) => b.addEventListener('click', () => { shareCfg.ratio = b.getAttribute('data-ratio'); syncSegs(); schedulePreview(); }));
+    document.getElementById('themeGroup')?.querySelectorAll('.seg-btn').forEach((b) => b.addEventListener('click', () => { shareCfg.theme = b.getAttribute('data-theme'); syncSegs(); schedulePreview(); }));
+    document.getElementById('sortGroup')?.querySelectorAll('.seg-btn').forEach((b) => b.addEventListener('click', () => { shareCfg.sort = b.getAttribute('data-sort'); syncSegs(); schedulePreview(); }));
+    if (showCostToggle) showCostToggle.addEventListener('change', () => { shareCfg.showCost = showCostToggle.checked; schedulePreview(); });
+    if (shareTitleInput) shareTitleInput.addEventListener('input', () => { shareCfg.title = shareTitleInput.value; schedulePreview(); });
+    document.getElementById('selAll')?.addEventListener('click', () => { shareCfg.selected = new Set((lastShareData || []).map((_, i) => i)); buildDeviceList(); schedulePreview(); });
+    document.getElementById('selNone')?.addEventListener('click', () => { shareCfg.selected = new Set(); buildDeviceList(); schedulePreview(); });
+    if (shareDownloadBtn) shareDownloadBtn.addEventListener('click', doDownload);
+    if (shareDoBtn) shareDoBtn.addEventListener('click', doShare);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && shareModal && !shareModal.classList.contains('hidden')) closeShareModal();
+    });
 
     applyStaticTexts();
   </script>
