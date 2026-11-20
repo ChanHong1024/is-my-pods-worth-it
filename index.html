@@ -820,8 +820,18 @@
       if (info.sony) return info.sony.label;
       if (info.modelCode) {
         const known = info.modelKey && MODEL_MAP[info.modelKey];
-        const official = known ? MODEL_MAP[info.modelKey][currentLang] : t('modelPrefix', { code: info.modelCode });
-        return official + ' (' + info.modelCode + ')';
+        if (!known) return t('modelPrefix', { code: info.modelCode });
+        const full = MODEL_MAP[info.modelKey][currentLang];
+        // 拆出「產品名 + 括號變體」，例如 "AirPods Pro（第 2 代 · Lightning）"
+        const m = full.match(/^(.*?)[（(](.+?)[）)]$/);
+        if (m) {
+          const base = m[1].trim();
+          const variant = m[2].trim();
+          const title = (info.displayName || '').toLowerCase();
+          // 標題已含產品名 → 只顯示變體（第幾代／Lightning 等）；否則保留完整型號
+          return (title && title.includes(base.toLowerCase())) ? variant : full;
+        }
+        return full;
       }
       if (/earpods/i.test(info.displayName || '')) return 'Apple EarPods';
       if (info.mfg) return info.mfg;
