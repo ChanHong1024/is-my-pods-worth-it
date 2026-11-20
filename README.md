@@ -33,6 +33,8 @@
 2. 將匯出嘅 `export.zip` 拖入網頁（或者揀 `export.xml`）
 3. 即時見到分型號統計
 
+> 唔記得步驟？撳上傳區右上角嘅 **?** 掣，會有逐步匯出教學（中英對照）。
+
 ## 技術棧
 
 - [Tailwind CSS](https://tailwindcss.com/)（Play CDN，免 build）

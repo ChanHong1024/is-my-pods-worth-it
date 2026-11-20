@@ -333,7 +333,10 @@
     </header>
 
     <section class="mt-6">
-      <div id="dropZone" class="drop-zone liquid-soft cursor-pointer rounded-3xl border border-dashed !border-white/20 px-6 py-12 text-center">
+      <div id="dropZone" class="drop-zone liquid-soft relative cursor-pointer rounded-3xl border border-dashed !border-white/20 px-6 py-12 text-center">
+        <button id="helpBtn" type="button" class="liquid-soft absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full text-cyan-200/80 hover:text-cyan-100" aria-label="Export guide">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+        </button>
         <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 shadow-inner">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-cyan-200/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -440,7 +443,36 @@
       <div class="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-white/10 pt-4">
         <button id="shareCancel" class="rounded-full px-4 py-2 text-sm text-white/70 hover:text-white" data-i18n="cancel">取消</button>
         <button id="shareDownload" class="liquid-soft rounded-full px-4 py-2 text-sm font-semibold text-white" data-i18n="download">下載 PNG</button>
-        <button id="shareDo" class="btn-glass rounded-full px-5 py-2 text-sm font-semibold" data-i18n="share">分享…</button>
+            <button id="shareDo" class="btn-glass rounded-full px-5 py-2 text-sm font-semibold" data-i18n="share">分享…</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="guideModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6" aria-hidden="true">
+    <div id="guideBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="guideTitle" class="liquid relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-[1.75rem] p-6 sm:p-8">
+      <div class="flex items-start justify-between gap-4">
+        <h2 id="guideTitle" class="text-lg font-bold sm:text-xl" data-i18n="guideTitle">如何匯出健康資料？</h2>
+        <button id="guideCloseX" class="liquid-soft flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/70 hover:text-white" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <p class="mt-2 text-sm leading-relaxed text-white/60" data-i18n="guideIntro">只需幾步，喺 iPhone「健康」App 匯出 XML。100% 本地解析，資料唔會上傳。</p>
+
+      <ol class="mt-4 space-y-3 overflow-y-auto pr-1 text-sm leading-relaxed text-white/80">
+        <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-200">1</span><span data-i18n="guideStep1">喺 iPhone 打開「健康」App。</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-200">2</span><span data-i18n="guideStep2">點右上角你嘅個人頭像。</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-200">3</span><span data-i18n="guideStep3">拉到最底，點「匯出所有健康資料」。</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-200">4</span><span data-i18n="guideStep4">確認後等佢準備（大檔案可能要幾分鐘）。</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-200">5</span><span data-i18n="guideStep5">將匯出嘅 export.zip 用 AirDrop 或「檔案」App 傳到電腦（或直接喺手機開本網站）。</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-bold text-cyan-200">6</span><span data-i18n="guideStep6">返到呢度，將 export.zip 或解壓後嘅 export.xml 拖入去，即時睇結果。</span></li>
+      </ol>
+
+      <p class="mt-4 text-xs leading-relaxed text-white/45" data-i18n="guideNote">唔想解壓都得——直接拖入 export.zip 就得，解析全部喺你部裝置完成。</p>
+
+      <div class="mt-5 flex justify-end">
+        <button id="guideDone" class="btn-glass rounded-full px-5 py-2 text-sm font-semibold" data-i18n="guideClose">明白</button>
       </div>
     </div>
   </div>
@@ -504,7 +536,17 @@
         cancel: '取消',
         download: '下載 PNG',
         share: '分享…',
-        noDeviceSelected: '請最少揀一部裝置'
+        noDeviceSelected: '請最少揀一部裝置',
+        guideTitle: '如何匯出健康資料？',
+        guideIntro: '只需幾步，喺 iPhone「健康」App 匯出 XML。100% 本地解析，資料唔會上傳。',
+        guideStep1: '喺 iPhone 打開「健康」App。',
+        guideStep2: '點右上角你嘅個人頭像。',
+        guideStep3: '拉到最底，點「匯出所有健康資料」。',
+        guideStep4: '確認後等佢準備（大檔案可能要幾分鐘）。',
+        guideStep5: '將匯出嘅 export.zip 用 AirDrop 或「檔案」App 傳到電腦（或直接喺手機開本網站）。',
+        guideStep6: '返到呢度，將 export.zip 或解壓後嘅 export.xml 拖入去，即時睇結果。',
+        guideNote: '唔想解壓都得——直接拖入 export.zip 就得，解析全部喺你部裝置完成。',
+        guideClose: '明白'
       },
       en: {
         h1: 'Is my Pods Worth It?',
@@ -562,7 +604,17 @@
         cancel: 'Cancel',
         download: 'Download PNG',
         share: 'Share…',
-        noDeviceSelected: 'Select at least one device'
+        noDeviceSelected: 'Select at least one device',
+        guideTitle: 'How to export your Health data',
+        guideIntro: 'A few quick steps to export XML from the Health app on iPhone. 100% local — your data never leaves your device.',
+        guideStep1: 'Open the Health app on your iPhone.',
+        guideStep2: 'Tap your profile picture at the top-right.',
+        guideStep3: 'Scroll to the bottom and tap "Export All Health Data".',
+        guideStep4: 'Confirm and wait while it prepares (large files may take a few minutes).',
+        guideStep5: 'AirDrop or save the export.zip to your computer via Files (or open this site on your phone).',
+        guideStep6: 'Back here, drop the export.zip or the extracted export.xml to see results instantly.',
+        guideNote: 'No need to unzip — just drop the export.zip; everything is parsed on your device.',
+        guideClose: 'Got it'
       }
     };
 
@@ -1481,6 +1533,35 @@
     if (shareDoBtn) shareDoBtn.addEventListener('click', doShare);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && shareModal && !shareModal.classList.contains('hidden')) closeShareModal();
+    });
+
+    // ===== 匯出教學彈窗 =====
+    const guideModal = document.getElementById('guideModal');
+    function openGuide() {
+      if (!guideModal) return;
+      guideModal.classList.remove('hidden');
+      guideModal.classList.add('flex');
+      guideModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      const btn = document.getElementById('guideCloseX');
+      if (btn) btn.focus();
+    }
+    function closeGuide() {
+      if (!guideModal) return;
+      guideModal.classList.add('hidden');
+      guideModal.classList.remove('flex');
+      guideModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      const btn = document.getElementById('helpBtn');
+      if (btn) btn.focus();
+    }
+    const helpBtnEl = document.getElementById('helpBtn');
+    if (helpBtnEl) helpBtnEl.addEventListener('click', (e) => { e.stopPropagation(); openGuide(); });
+    document.getElementById('guideCloseX')?.addEventListener('click', closeGuide);
+    document.getElementById('guideDone')?.addEventListener('click', closeGuide);
+    document.getElementById('guideBackdrop')?.addEventListener('click', closeGuide);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && guideModal && !guideModal.classList.contains('hidden')) closeGuide();
     });
 
     applyStaticTexts();
