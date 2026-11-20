@@ -1055,84 +1055,102 @@
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       ctx.fillText(t('shareSubtitle', { n: items.length }), padX, 250);
 
-      const cx = padX, cy = 320, cw = W - padX * 2, ch = 762;
-      roundRect(cx, cy, cw, ch, 48);
-      ctx.fillStyle = 'rgba(255,255,255,0.07)';
+      const px = padX, py = 300, pw = W - padX * 2, ph = H - py - 120;
+      roundRect(px, py, pw, ph, 40);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
       ctx.lineWidth = 2;
       ctx.stroke();
-      const hi = ctx.createLinearGradient(0, cy, 0, cy + 140);
-      hi.addColorStop(0, 'rgba(255,255,255,0.16)');
+      const hi = ctx.createLinearGradient(0, py, 0, py + 120);
+      hi.addColorStop(0, 'rgba(255,255,255,0.12)');
       hi.addColorStop(1, 'rgba(255,255,255,0)');
-      roundRect(cx, cy, cw, ch, 48);
+      roundRect(px, py, pw, ph, 40);
       ctx.fillStyle = hi;
       ctx.fill();
 
-      const hero = items[0];
-      const inX = cx + 60;
-      const inR = cx + cw - 60;
+      const inX = px + 44;
+      const inR = px + pw - 44;
+      const listTop = py + 36;
+      const avail = ph - 64;
+      const n = items.length;
+      const cap = n <= 2 ? 210 : n <= 4 ? 170 : n <= 6 ? 145 : 118;
+      const rowH = Math.min(cap, avail / n);
+      const startY = listTop + Math.max(0, (avail - rowH * n) / 2);
 
-      setFont(56, 800);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(truncate(hero.name, cw - 120), inX, cy + 108);
+      let bestIdx = -1, bestCp = -1;
+      items.forEach((it, i) => { if (it.cpScore != null && it.cpScore > bestCp) { bestCp = it.cpScore; bestIdx = i; } });
 
-      setFont(30, 500);
-      ctx.fillStyle = 'rgba(165,243,252,0.9)';
-      ctx.fillText(truncate(hero.model, cw - 120), inX, cy + 156);
+      const showModel = rowH >= 96;
+      const showHours = rowH >= 84;
+      const showBar = rowH >= 118;
+      const nameFont = rowH >= 130 ? 40 : rowH >= 100 ? 34 : 28;
+      const modelFont = Math.max(18, Math.round(nameFont * 0.58));
+      const cpFont = rowH >= 130 ? 54 : rowH >= 100 ? 44 : 34;
+      const smallFont = rowH >= 100 ? 24 : 20;
+      const barW = inR - inX;
+      const nameMaxW = barW - cpFont * 2.2 - 24;
 
-      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(inX, cy + 196); ctx.lineTo(inR, cy + 196); ctx.stroke();
+      ctx.textBaseline = 'middle';
+      items.forEach((it, i) => {
+        const y0 = startY + i * rowH;
+        const midY = y0 + rowH / 2;
 
-      const rows = [
-        [t('totalDuration'), t('hours', { h: hero.hours.toFixed(1) })],
-        [t('weightedAvg'), t('db', { x: hero.avgDb })],
-        [t('costPerHour'), hero.costPerHour != null ? t('perHour', { x: 'HK$' + hero.costPerHour.toFixed(hero.costPerHour < 10 ? 1 : 0) }) : '—'],
-        [t('rrp'), hero.price != null ? 'HK$' + hero.price.toLocaleString(locale) : '—']
-      ];
-      let ry = cy + 262;
-      for (const [label, val] of rows) {
-        setFont(34, 500); ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.textAlign = 'left';
-        ctx.fillText(label, inX, ry);
-        setFont(36, 800); ctx.fillStyle = '#ffffff'; ctx.textAlign = 'right';
-        ctx.fillText(val, inR, ry);
-        ry += 66;
-      }
-      ctx.textAlign = 'left';
-
-      const cpLabelY = cy + ch - 176;
-      setFont(34, 600); ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillText(t('cpScore'), inX, cpLabelY);
-
-      const barY = cpLabelY + 56;
-      const barW = cw - 120;
-      roundRect(inX, barY, barW, 16, 8);
-      ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.fill();
-
-      if (hero.cpScore != null) {
-        setFont(92, 800); ctx.fillStyle = '#ffffff'; ctx.textAlign = 'right';
-        ctx.fillText(String(hero.cpScore), inR - 92, cpLabelY + 18);
-        setFont(32, 600); ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.fillText('/100', inR, cpLabelY + 16);
         ctx.textAlign = 'left';
-        const grad = ctx.createLinearGradient(inX, 0, inX + barW, 0);
-        grad.addColorStop(0, '#38bdf8'); grad.addColorStop(1, '#a78bfa');
-        roundRect(inX, barY, Math.max(16, barW * hero.cpScore / 100), 16, 8);
-        ctx.fillStyle = grad; ctx.fill();
-      } else {
-        setFont(38, 700); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.textAlign = 'right';
-        ctx.fillText(t('shareNoPrice'), inR, cpLabelY + 12); ctx.textAlign = 'left';
-      }
+        setFont(nameFont, 800);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(truncate(it.name, nameMaxW), inX, midY - (showModel ? 13 : 0));
 
-      const rest = items.slice(1, 4);
-      if (rest.length) {
-        setFont(28, 600); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.textAlign = 'left';
-        const line = rest.map((it) => truncate(it.model, 300) + (it.cpScore != null ? ' · CP ' + it.cpScore : '')).join('    ');
-        ctx.fillText(truncate(line, W - padX * 2), padX, cy + ch + 74);
-      }
+        if (showModel) {
+          setFont(modelFont, 500);
+          ctx.fillStyle = 'rgba(165,243,252,0.85)';
+          ctx.fillText(truncate(it.model, nameMaxW), inX, midY + 20);
+        }
 
-      setFont(24, 500); ctx.fillStyle = 'rgba(255,255,255,0.42)'; ctx.textAlign = 'center';
+        const cpY = midY - (showHours ? 11 : 0);
+        ctx.textAlign = 'right';
+        if (it.cpScore != null) {
+          setFont(cpFont, 800);
+          ctx.fillStyle = (i === bestIdx) ? '#7dd3fc' : '#ffffff';
+          ctx.fillText(String(it.cpScore), inR - 44, cpY);
+          setFont(Math.round(smallFont * 0.8), 600);
+          ctx.fillStyle = 'rgba(255,255,255,0.5)';
+          ctx.fillText('/100', inR, cpY + cpFont * 0.16);
+        } else {
+          setFont(Math.round(cpFont * 0.7), 700);
+          ctx.fillStyle = 'rgba(255,255,255,0.45)';
+          ctx.fillText('—', inR, cpY);
+        }
+
+        if (showHours) {
+          setFont(smallFont, 600);
+          ctx.fillStyle = 'rgba(255,255,255,0.5)';
+          ctx.fillText(t('hours', { h: it.hours.toFixed(1) }), inR, midY + 21);
+        }
+
+        if (showBar) {
+          const barY = y0 + rowH - 18;
+          roundRect(inX, barY, barW, 8, 4);
+          ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.fill();
+          if (it.cpScore != null) {
+            const g = ctx.createLinearGradient(inX, 0, inR, 0);
+            g.addColorStop(0, '#38bdf8'); g.addColorStop(1, '#a78bfa');
+            roundRect(inX, barY, Math.max(8, barW * it.cpScore / 100), 8, 4);
+            ctx.fillStyle = g; ctx.fill();
+          }
+        }
+
+        if (i < n - 1) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(inX, y0 + rowH); ctx.lineTo(inR, y0 + rowH); ctx.stroke();
+        }
+      });
+
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'center';
+      setFont(24, 500);
+      ctx.fillStyle = 'rgba(255,255,255,0.42)';
       ctx.fillText(t('shareFooter'), W / 2, H - 52, W - padX * 2);
       ctx.textAlign = 'left';
     }
