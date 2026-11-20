@@ -190,6 +190,11 @@
         <stop offset="0" stop-color="#f8f3ea"/>
         <stop offset="1" stop-color="#dccdb7"/>
       </linearGradient>
+      <linearGradient id="apMaxBand" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#eae0cf"/>
+        <stop offset="0.5" stop-color="#dccfb9"/>
+        <stop offset="1" stop-color="#c2b092"/>
+      </linearGradient>
       <linearGradient id="apSilver" gradientUnits="userSpaceOnUse" x1="0" y1="42" x2="0" y2="56">
         <stop offset="0" stop-color="#ffffff"/>
         <stop offset="1" stop-color="#96a3b5"/>
@@ -602,20 +607,26 @@
       pro: `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#apShadow)"><g transform="translate(48 48) scale(0.95) translate(-48 -48)"><use href="#apProPair"/></g></g></svg>`,
       max: `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <g filter="url(#apShadow)">
-          <path d="M26 56V46A22 22 0 0 1 70 46V56" fill="none" stroke="url(#apMaxBody)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M26 56V46A22 22 0 0 1 70 46V56" fill="none" stroke="url(#apMaxBand)" stroke-width="10" stroke-linecap="round"/>
           <path d="M26 52V46A22 22 0 0 1 70 46V52" fill="none" stroke="url(#apMaxMesh)" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
+          <path d="M28 49V46A20 20 0 0 1 68 46V49" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.2" stroke-linecap="round"/>
+          <rect x="23.3" y="38" width="5.4" height="14" rx="2.4" fill="url(#apSilver)"/>
+          <rect x="24.2" y="39" width="1.2" height="11" rx="0.6" fill="#ffffff" opacity="0.55"/>
           <ellipse cx="26" cy="72" rx="15" ry="20" fill="url(#apMaxBody)" stroke="#a8946f" stroke-opacity="0.5" stroke-width="1"/>
-          <ellipse cx="26" cy="73" rx="9.5" ry="14" fill="url(#apMaxMesh)"/>
-          <ellipse cx="26" cy="73" rx="9.5" ry="14" fill="url(#apMaxDots)" opacity="0.7"/>
-          <ellipse cx="21.5" cy="67" rx="5" ry="8" fill="#ffffff" opacity="0.3"/>
-          <circle cx="31.5" cy="61" r="2" fill="#f5eee1" stroke="#bda884" stroke-width="0.8"/>
-          <rect x="23.7" y="42" width="4.6" height="12" rx="2" fill="url(#apSilver)"/>
+          <ellipse cx="26" cy="73" rx="10.5" ry="15" fill="none" stroke="#cdbfa6" stroke-opacity="0.7" stroke-width="0.8"/>
+          <ellipse cx="26" cy="73" rx="9" ry="13.5" fill="url(#apMaxMesh)"/>
+          <ellipse cx="26" cy="73" rx="9" ry="13.5" fill="url(#apMaxDots)" opacity="0.7"/>
+          <ellipse cx="21.5" cy="66" rx="4.5" ry="7.5" fill="#ffffff" opacity="0.32"/>
+          <rect x="67.3" y="38" width="5.4" height="14" rx="2.4" fill="url(#apSilver)"/>
+          <rect x="68.2" y="39" width="1.2" height="11" rx="0.6" fill="#ffffff" opacity="0.55"/>
           <ellipse cx="70" cy="72" rx="15" ry="20" fill="url(#apMaxBody)" stroke="#a8946f" stroke-opacity="0.5" stroke-width="1"/>
-          <ellipse cx="70" cy="73" rx="9.5" ry="14" fill="url(#apMaxMesh)"/>
-          <ellipse cx="70" cy="73" rx="9.5" ry="14" fill="url(#apMaxDots)" opacity="0.7"/>
-          <ellipse cx="74.5" cy="67" rx="5" ry="8" fill="#ffffff" opacity="0.3"/>
-          <circle cx="64.5" cy="61" r="2" fill="#f5eee1" stroke="#bda884" stroke-width="0.8"/>
-          <rect x="67.7" y="42" width="4.6" height="12" rx="2" fill="url(#apSilver)"/>
+          <ellipse cx="70" cy="73" rx="10.5" ry="15" fill="none" stroke="#cdbfa6" stroke-opacity="0.7" stroke-width="0.8"/>
+          <ellipse cx="70" cy="73" rx="9" ry="13.5" fill="url(#apMaxMesh)"/>
+          <ellipse cx="70" cy="73" rx="9" ry="13.5" fill="url(#apMaxDots)" opacity="0.7"/>
+          <ellipse cx="74.5" cy="66" rx="4.5" ry="7.5" fill="#ffffff" opacity="0.32"/>
+          <rect x="71.6" y="56.6" width="4" height="1.5" rx="0.75" fill="#cabfa9" stroke="#b6a27f" stroke-width="0.5"/>
+          <circle cx="78" cy="59" r="2.6" fill="url(#apSilver)" stroke="#8a97a6" stroke-width="0.6"/>
+          <line x1="76.7" y1="57.4" x2="76.7" y2="60.6" stroke="#8a97a6" stroke-width="0.6" stroke-linecap="round"/>
         </g>
       </svg>`,
       'sony-wh': `<svg viewBox="0 0 96 96" class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#apShadow)"><path d="M26 56V46A22 22 0 0 1 70 46V56" fill="none" stroke="url(#sonyBandG)" stroke-width="11" stroke-linecap="round"/><path d="M26 52V46A22 22 0 0 1 70 46V52" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/><use href="#sonyWhCup" transform="translate(26 70)"/><use href="#sonyWhCup" transform="translate(70 70)"/></g></svg>`,
