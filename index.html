@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Is my Pods Worth It? · AirPods 分型號聆聽統計</title>
+  <meta name="description" content="Is my Pods Worth It? — 自動解析 Apple 健康 export 嘅 AirPods 分型號聆聽統計，100% 本地離線運作。" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: #08080d;
+    }
+
+    /* 背景 mesh gradient 光暈 */
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      overflow: hidden;
+      background:
+        radial-gradient(1200px 800px at 15% -10%, rgba(56, 189, 248, 0.16), transparent 60%),
+        radial-gradient(1000px 700px at 90% 10%, rgba(167, 139, 250, 0.18), transparent 55%),
+        radial-gradient(900px 900px at 50% 120%, rgba(244, 114, 182, 0.14), transparent 60%),
+        #08080d;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(90px);
+      opacity: 0.55;
+      mix-blend-mode: screen;
+      will-change: transform;
+    }
+    .orb-1 { width: 480px; height: 480px; top: -120px; left: -80px; background: #38bdf8; animation: drift 22s ease-in-out infinite; }
+    .orb-2 { width: 420px; height: 420px; top: 10%; right: -120px; background: #8b5cf6; animation: drift 28s ease-in-out infinite reverse; }
+    .orb-3 { width: 460px; height: 460px; bottom: -160px; left: 30%; background: #ec4899; animation: drift 25s ease-in-out infinite; }
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, 30px) scale(1.08); }
+      66% { transform: translate(-30px, -20px) scale(0.94); }
+    }
+
+    /* Liquid Glass 核心效果 */
+    .liquid {
+      position: relative;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.045));
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      backdrop-filter: blur(26px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow:
+        0 20px 50px -12px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+    }
+    .liquid::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.20), transparent 46%);
+      pointer-events: none;
+    }
+    .liquid-soft {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .drop-zone {
+      transition: border-color .25s, background .25s, box-shadow .25s, transform .25s;
+    }
+    .drop-zone.dragover {
+      border-color: rgba(125, 211, 252, 0.85) !important;
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transform: scale(1.01);
+    }
+
+    .btn-glass {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(224, 242, 254, 0.85));
+      color: #0b1220;
+      box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+    }
+    .btn-glass:hover { transform: translateY(-1px); box-shadow: 0 12px 26px -6px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.9); }
+    .btn-glass:active { transform: translateY(0); }
+
+    .badge-model {
+      background: rgba(56, 189, 248, 0.12);
+      color: #a5f3fc;
+      border: 1px solid rgba(103, 232, 249, 0.22);
+    }
+
+    .lang-btn {
+      transition: background .2s, color .2s;
+    }
+    .lang-btn.active {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    ::selection { background: rgba(56, 189, 248, 0.35); }
+  </style>
+</head>
+<body class="min-h-screen text-white">
+  <div class="bg-scene">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <main class="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14">
+    <header class="liquid rounded-[2rem] px-6 py-8 sm:px-9">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-[0.2em] text-cyan-200/70" data-i18n="kicker">AirPods Listening Report</p>
+          <h1 class="mt-2 text-2xl font-bold leading-tight sm:text-4xl" data-i18n="h1">Is my Pods Worth It?</h1>
+          <p class="mt-3 max-w-xl text-sm leading-relaxed text-white/60 sm:text-base" data-i18n="subtitle">自動提取 XML 內嘅硬件型號（Model ID）與裝置名稱，100% 本地離線解析。</p>
+        </div>
+
+        <div class="liquid-soft flex shrink-0 items-center rounded-full p-1" role="group" aria-label="Language">
+          <button id="langZh" class="lang-btn rounded-full px-3 py-1.5 text-sm font-medium text-white/60" aria-pressed="true">中</button>
+          <button id="langEn" class="lang-btn rounded-full px-3 py-1.5 text-sm font-medium text-white/60" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="mt-6">
+      <div id="dropZone" class="drop-zone liquid-soft cursor-pointer rounded-3xl border border-dashed !border-white/20 px-6 py-12 text-center">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-cyan-200/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+        </div>
+        <p class="mx-auto mt-5 max-w-md text-sm leading-relaxed text-white/75" id="dropHint" data-i18n-html="dropHint">將 iPhone「健康」匯出嘅 <strong>export.zip</strong> 或 <strong>export.xml</strong> 拖入呢度</p>
+        <button id="chooseBtn" class="btn-glass mt-6 rounded-full px-6 py-2.5 text-sm font-semibold" data-i18n="chooseFile">選擇檔案</button>
+        <input type="file" id="fileInput" accept=".zip,.xml" class="hidden" />
+        <p id="status" class="mt-5 text-sm font-medium text-cyan-200/90"></p>
+      </div>
+    </section>
+
+    <div id="results" class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2"></div>
+
+    <footer class="mt-10 flex items-center justify-center gap-2 text-xs text-white/40">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+      </svg>
+      <span data-i18n="footer">100% 本地解析 · 資料永不離開你嘅裝置</span>
+    </footer>
+  </main>
+
+  <script>
+    // ===== i18n =====
+    const STRINGS = {
+      'zh-HK': {
+        kicker: 'AirPods Listening Report',
+        h1: 'Is my Pods Worth It?',
+        title: 'Is my Pods Worth It? · AirPods 分型號聆聽統計',
+        subtitle: '自動提取 XML 內嘅硬件型號（Model ID）與裝置名稱，100% 本地離線解析。',
+        dropHint: '將 iPhone「健康」匯出嘅 <strong>export.zip</strong> 或 <strong>export.xml</strong> 拖入呢度',
+        chooseFile: '選擇檔案',
+        footer: '100% 本地解析 · 資料永不離開你嘅裝置',
+        statusPreparing: '準備解析：{name}（{size} MB）...',
+        statusStreaming: '正在本地串流解析... {pct}%',
+        errNoXml: '錯誤：喺 ZIP 入面搵唔到 export.xml。',
+        errFileType: '請選擇 .zip 或 .xml 格式檔案。',
+        errParse: '解析出錯：{msg}',
+        emptyRecords: '解析完成，但搵唔到任何耳機音量（HeadphoneAudioExposure）紀錄。',
+        done: '解析完成！共識別出 {n} 個耳機裝置。',
+        totalDuration: '總聆聽時長',
+        weightedAvg: '時間加權平均音量',
+        maxVolume: '最高記錄音量',
+        dateRange: '使用日期範圍',
+        sampleCount: '取樣紀錄筆數',
+        hours: '{h} 小時',
+        db: '{x} dB',
+        range: '{a} ~ {b}',
+        records: '{n} 筆',
+        unknownDevice: '未知音訊裝置',
+        noModel: '無硬件型號紀錄',
+        otherDevice: '其他藍牙/有線耳機',
+        modelPrefix: '型號 {code}'
+      },
+      en: {
+        kicker: 'AirPods Listening Report',
+        h1: 'Is my Pods Worth It?',
+        title: 'Is my Pods Worth It? · AirPods Listening Stats by Model',
+        subtitle: 'Automatically extracts hardware model IDs and device names from your XML — 100% local, offline parsing.',
+        dropHint: 'Drop your iPhone Health <strong>export.zip</strong> or <strong>export.xml</strong> here',
+        chooseFile: 'Choose file',
+        footer: '100% local · your data never leaves your device',
+        statusPreparing: 'Preparing to parse: {name} ({size} MB)...',
+        statusStreaming: 'Parsing locally (streaming)... {pct}%',
+        errNoXml: 'Error: no export.xml found in the ZIP.',
+        errFileType: 'Please choose a .zip or .xml file.',
+        errParse: 'Parse error: {msg}',
+        emptyRecords: 'Parsing complete, but no headphone volume (HeadphoneAudioExposure) records were found.',
+        done: 'Done! {n} headphone devices identified.',
+        totalDuration: 'Total listening time',
+        weightedAvg: 'Time-weighted average volume',
+        maxVolume: 'Highest recorded volume',
+        dateRange: 'Date range',
+        sampleCount: 'Sample records',
+        hours: '{h} hours',
+        db: '{x} dB',
+        range: '{a} ~ {b}',
+        records: '{n} records',
+        unknownDevice: 'Unknown audio device',
+        noModel: 'No hardware model recorded',
+        otherDevice: 'Other Bluetooth/wired headphones',
+        modelPrefix: 'Model {code}'
+      }
+    };
+
+    let currentLang = detectLang();
+
+    function detectLang() {
+      const stored = localStorage.getItem('lang');
+      if (stored === 'zh-HK' || stored === 'en') return stored;
+      const nav = (navigator.language || 'en').toLowerCase();
+      return nav.startsWith('zh') ? 'zh-HK' : 'en';
+    }
+
+    function t(key, vars) {
+      let s = (STRINGS[currentLang] && STRINGS[currentLang][key]) || STRINGS.en[key] || key;
+      if (vars) {
+        for (const k in vars) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+
+    // Apple 常見耳機硬件 Model 編號對照表（繁中 + English）
+    const MODEL_MAP = {
+      'A1523': { 'zh-HK': 'AirPods（第 1 代）', en: 'AirPods (1st generation)' },
+      'A1722': { 'zh-HK': 'AirPods（第 1 代）', en: 'AirPods (1st generation)' },
+      'A2031': { 'zh-HK': 'AirPods（第 2 代）', en: 'AirPods (2nd generation)' },
+      'A2032': { 'zh-HK': 'AirPods（第 2 代）', en: 'AirPods (2nd generation)' },
+      'A2564': { 'zh-HK': 'AirPods（第 3 代）', en: 'AirPods (3rd generation)' },
+      'A2565': { 'zh-HK': 'AirPods（第 3 代）', en: 'AirPods (3rd generation)' },
+      'A3050': { 'zh-HK': 'AirPods 4', en: 'AirPods 4' },
+      'A3053': { 'zh-HK': 'AirPods 4', en: 'AirPods 4' },
+      'A3055': { 'zh-HK': 'AirPods 4（主動消噪版）', en: 'AirPods 4 (Active Noise Cancellation)' },
+      'A3056': { 'zh-HK': 'AirPods 4（主動消噪版）', en: 'AirPods 4 (Active Noise Cancellation)' },
+      'A2083': { 'zh-HK': 'AirPods Pro（第 1 代）', en: 'AirPods Pro (1st generation)' },
+      'A2084': { 'zh-HK': 'AirPods Pro（第 1 代）', en: 'AirPods Pro (1st generation)' },
+      'A2698': { 'zh-HK': 'AirPods Pro（第 2 代 · Lightning）', en: 'AirPods Pro (2nd generation · Lightning)' },
+      'A2699': { 'zh-HK': 'AirPods Pro（第 2 代 · Lightning）', en: 'AirPods Pro (2nd generation · Lightning)' },
+      'A3047': { 'zh-HK': 'AirPods Pro（第 2 代 · USB-C）', en: 'AirPods Pro (2nd generation · USB-C)' },
+      'A3048': { 'zh-HK': 'AirPods Pro（第 2 代 · USB-C）', en: 'AirPods Pro (2nd generation · USB-C)' },
+      'A2096': { 'zh-HK': 'AirPods Max（Lightning）', en: 'AirPods Max (Lightning)' },
+      'A3184': { 'zh-HK': 'AirPods Max（USB-C）', en: 'AirPods Max (USB-C)' }
+    };
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+    const chooseBtn = document.getElementById('chooseBtn');
+    const langZh = document.getElementById('langZh');
+    const langEn = document.getElementById('langEn');
+
+    let lastDeviceStats = null;
+    let lastStatus = null;
+
+    function setStatus(key, vars) {
+      lastStatus = { key, vars };
+      statusEl.textContent = t(key, vars);
+    }
+
+    function applyStaticTexts() {
+      document.documentElement.lang = currentLang;
+      document.title = t('title');
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        el.textContent = t(el.getAttribute('data-i18n'));
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+        el.innerHTML = t(el.getAttribute('data-i18n-html'));
+      });
+      if (lastStatus) setStatus(lastStatus.key, lastStatus.vars);
+      updateLangToggle();
+    }
+
+    function updateLangToggle() {
+      langZh.classList.toggle('active', currentLang === 'zh-HK');
+      langEn.classList.toggle('active', currentLang === 'en');
+      langZh.setAttribute('aria-pressed', String(currentLang === 'zh-HK'));
+      langEn.setAttribute('aria-pressed', String(currentLang === 'en'));
+    }
+
+    function setLang(lang) {
+      if (currentLang === lang) return;
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      applyStaticTexts();
+      if (lastDeviceStats) renderResults(lastDeviceStats);
+    }
+
+    langZh.addEventListener('click', () => setLang('zh-HK'));
+    langEn.addEventListener('click', () => setLang('en'));
+
+    chooseBtn.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+
+    // 從 device 字串提取 name、manufacturer、model
+    function parseDeviceInfo(deviceAttr, fallbackSource) {
+      if (!deviceAttr) {
+        return {
+          key: 'source:' + fallbackSource,
+          displayName: fallbackSource || t('unknownDevice'),
+          modelCode: '',
+          mfg: ''
+        };
+      }
+
+      // 還原 XML 轉義字元
+      const decoded = deviceAttr.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
+      const nameMatch = decoded.match(/name:([^,>]+)/);
+      const modelMatch = decoded.match(/model:([^,>]+)/);
+      const mfgMatch = decoded.match(/manufacturer:([^,>]+)/);
+
+      const devName = nameMatch ? nameMatch[1].trim() : '';
+      const modelCode = modelMatch ? modelMatch[1].trim() : '';
+      const mfg = mfgMatch ? mfgMatch[1].trim() : '';
+
+      const displayName = devName || modelCode || mfg || '';
+
+      // 用「正式型號（英文 canonical）+ 裝置名稱」做唯一分組 Key，避免左右耳（如 A2083/A2084）被拆成兩張卡，同時與語言無關
+      const canonical = MODEL_MAP[modelCode] ? MODEL_MAP[modelCode].en : (modelCode || mfg || 'other');
+      const groupKey = canonical + '__' + displayName;
+
+      return { key: groupKey, displayName, modelCode, mfg };
+    }
+
+    function modelLabelFor(info) {
+      if (info.modelCode) {
+        const official = MODEL_MAP[info.modelCode] ? MODEL_MAP[info.modelCode][currentLang] : t('modelPrefix', { code: info.modelCode });
+        return official + ' (' + info.modelCode + ')';
+      }
+      if (info.mfg) return info.mfg;
+      return t('otherDevice');
+    }
+
+    function displayNameFor(info) {
+      if (info.displayName) return info.displayName;
+      if (info.modelCode) {
+        return MODEL_MAP[info.modelCode] ? MODEL_MAP[info.modelCode][currentLang] : t('modelPrefix', { code: info.modelCode });
+      }
+      return t('otherDevice');
+    }
+
+    async function handleFile(file) {
+      resultsEl.innerHTML = '';
+      lastDeviceStats = null;
+      setStatus('statusPreparing', { name: file.name, size: (file.size / 1024 / 1024).toFixed(1) });
+
+      const deviceStats = new Map();
+      let leftover = '';
+      const decoder = new TextDecoder('utf-8');
+
+      const recordRegex = /<Record\b[^>]*type="HKQuantityTypeIdentifierHeadphoneAudioExposure"[^>]*\/?>/g;
+      const attrRegex = /(\w+)="([^"]*)"/g;
+
+      function processChunk(textChunk) {
+        const content = leftover + textChunk;
+        const lastCloseIdx = content.lastIndexOf('>');
+        if (lastCloseIdx === -1) {
+          leftover = content;
+          return;
+        }
+        const processable = content.slice(0, lastCloseIdx + 1);
+        leftover = content.slice(lastCloseIdx + 1);
+
+        let match;
+        recordRegex.lastIndex = 0;
+        while ((match = recordRegex.exec(processable)) !== null) {
+          const tag = match[0];
+          const attrs = {};
+          let attrMatch;
+          attrRegex.lastIndex = 0;
+          while ((attrMatch = attrRegex.exec(tag)) !== null) {
+            attrs[attrMatch[1]] = attrMatch[2];
+          }
+
+          const val = parseFloat(attrs.value);
+          const start = Date.parse(attrs.startDate);
+          const end = Date.parse(attrs.endDate);
+
+          if (!isNaN(val) && !isNaN(start) && !isNaN(end) && end >= start) {
+            const durationSec = (end - start) / 1000;
+            const info = parseDeviceInfo(attrs.device, attrs.sourceName);
+
+            if (!deviceStats.has(info.key)) {
+              deviceStats.set(info.key, {
+                info,
+                totalSeconds: 0,
+                weightedDbSum: 0,
+                count: 0,
+                maxDb: 0,
+                firstUsed: start,
+                lastUsed: end
+              });
+            }
+            const stat = deviceStats.get(info.key);
+            stat.totalSeconds += durationSec;
+            stat.weightedDbSum += val * durationSec;
+            stat.count += 1;
+            if (val > stat.maxDb) stat.maxDb = val;
+            if (start < stat.firstUsed) stat.firstUsed = start;
+            if (end > stat.lastUsed) stat.lastUsed = end;
+          }
+        }
+      }
+
+      try {
+        if (file.name.endsWith('.xml')) {
+          await streamReadBlob(file, (chunk) => {
+            processChunk(decoder.decode(chunk, { stream: true }));
+          });
+          processChunk(decoder.decode());
+          renderResults(deviceStats);
+        } else if (file.name.endsWith('.zip')) {
+          let foundExportXml = false;
+          const unzipper = new fflate.Unzip((zipFile) => {
+            if (zipFile.name.endsWith('export.xml')) {
+              foundExportXml = true;
+              zipFile.ondata = (err, data, final) => {
+                if (err) throw err;
+                processChunk(decoder.decode(data, { stream: !final }));
+                if (final) renderResults(deviceStats);
+              };
+              zipFile.start();
+            }
+          });
+          unzipper.register(fflate.UnzipInflate);
+
+          await streamReadBlob(file, (chunk) => {
+            unzipper.push(chunk, false);
+          });
+          unzipper.push(new Uint8Array(0), true);
+
+          if (!foundExportXml) {
+            setStatus('errNoXml');
+          }
+        } else {
+          setStatus('errFileType');
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus('errParse', { msg: err.message });
+      }
+    }
+
+    async function streamReadBlob(blob, onChunk) {
+      const CHUNK_SIZE = 4 * 1024 * 1024;
+      let offset = 0;
+      while (offset < blob.size) {
+        const slice = blob.slice(offset, offset + CHUNK_SIZE);
+        const buf = await slice.arrayBuffer();
+        onChunk(new Uint8Array(buf));
+        offset += CHUNK_SIZE;
+        const pct = Math.min(100, Math.round((offset / blob.size) * 100));
+        setStatus('statusStreaming', { pct: pct });
+        await new Promise((r) => setTimeout(r, 0));
+      }
+    }
+
+    function formatDate(ts) {
+      const d = new Date(ts);
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function renderResults(deviceStats) {
+      lastDeviceStats = deviceStats;
+
+      if (deviceStats.size === 0) {
+        setStatus('emptyRecords');
+        return;
+      }
+
+      setStatus('done', { n: deviceStats.size });
+
+      const sorted = Array.from(deviceStats.values()).sort((a, b) => b.totalSeconds - a.totalSeconds);
+      resultsEl.innerHTML = '';
+
+      const locale = currentLang === 'zh-HK' ? 'zh-HK' : 'en';
+
+      for (const stat of sorted) {
+        const hours = (stat.totalSeconds / 3600).toFixed(1);
+        const avgDb = stat.totalSeconds > 0 ? (stat.weightedDbSum / stat.totalSeconds).toFixed(1) : '0.0';
+        const name = displayNameFor(stat.info);
+        const model = modelLabelFor(stat.info);
+
+        const card = document.createElement('div');
+        card.className = 'liquid rounded-3xl p-6';
+        card.innerHTML = `
+          <div class="mb-4 border-b border-white/10 pb-4">
+            <div class="text-lg font-semibold leading-snug">${escapeHtml(name)}</div>
+            <div class="badge-model mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium">${escapeHtml(model)}</div>
+          </div>
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('totalDuration')}</span>
+              <span class="font-semibold">${t('hours', { h: hours })}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('weightedAvg')}</span>
+              <span class="font-semibold">${t('db', { x: avgDb })}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('maxVolume')}</span>
+              <span class="font-semibold">${t('db', { x: stat.maxDb.toFixed(1) })}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('dateRange')}</span>
+              <span class="font-semibold">${t('range', { a: formatDate(stat.firstUsed), b: formatDate(stat.lastUsed) })}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="text-white/55">${t('sampleCount')}</span>
+              <span class="font-semibold">${t('records', { n: stat.count.toLocaleString(locale) })}</span>
+            </div>
+          </div>
+        `;
+        resultsEl.appendChild(card);
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    applyStaticTexts();
+  </script>
+</body>
+</html>
