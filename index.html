@@ -337,6 +337,16 @@
 
     <p id="priceNote" class="mx-auto mt-6 hidden max-w-xl text-center text-[11px] leading-relaxed text-white/35" data-i18n="priceNote"></p>
 
+    <div id="shareWrap" class="mt-6 hidden flex-col items-center gap-2">
+      <button id="shareBtn" class="btn-glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3.75h6.75M6.75 3.75h10.5a2.25 2.25 0 012.25 2.25v12a2.25 2.25 0 01-2.25 2.25H6.75a2.25 2.25 0 01-2.25-2.25V6a2.25 2.25 0 012.25-2.25z" />
+        </svg>
+        <span data-i18n="shareBtn">一鍵生成分享圖</span>
+      </button>
+      <span class="text-xs text-white/40" data-i18n="shareHint">可分享到 Threads／IG，或下載 PNG</span>
+    </div>
+
     <footer class="mt-10 flex items-center justify-center gap-2 text-xs text-white/40">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -382,7 +392,14 @@
         cpNA: '未能計算',
         perHour: '{x}/小時',
         score: '{n}/100',
-        priceNote: 'RRP 為參考建議零售價（HK$，可自行調整）。CP 值 = 以每小時聆聽成本換算，0–100 分，越高越抵。'
+        priceNote: 'RRP 為參考建議零售價（HK$，可自行調整）。CP 值 = 以每小時聆聽成本換算，0–100 分，越高越抵。',
+        shareBtn: '一鍵生成分享圖',
+        shareHint: '可分享到 Threads／IG，或下載 PNG',
+        shareText: '我嘅耳機聆聽報告 — 邊款最抵？ #IsMyPodsWorthIt',
+        shareKicker: 'AIRPODS LISTENING REPORT',
+        shareSubtitle: '{n} 款耳機 · 100% 本地解析',
+        shareFooter: 'Is my Pods Worth It? · 100% 本地解析 · chanhong1024.github.io/is-my-pods-worth-it',
+        shareNoPrice: '未能計算'
       },
       en: {
         kicker: 'AirPods Listening Report',
@@ -418,7 +435,14 @@
         cpNA: 'N/A',
         perHour: '{x}/hr',
         score: '{n}/100',
-        priceNote: 'RRP is a reference retail price in HKD (edit as needed). Value score = based on cost per listening hour, 0–100, higher is better value.'
+        priceNote: 'RRP is a reference retail price in HKD (edit as needed). Value score = based on cost per listening hour, 0–100, higher is better value.',
+        shareBtn: 'Generate share image',
+        shareHint: 'Share to Threads / IG, or download PNG',
+        shareText: 'My headphone listening report — which is the best value? #IsMyPodsWorthIt',
+        shareKicker: 'AIRPODS LISTENING REPORT',
+        shareSubtitle: '{n} devices · 100% local',
+        shareFooter: 'Is my Pods Worth It? · 100% local · chanhong1024.github.io/is-my-pods-worth-it',
+        shareNoPrice: 'N/A'
       }
     };
 
@@ -558,6 +582,7 @@
 
     let lastDeviceStats = null;
     let lastStatus = null;
+    let lastShareData = null;
 
     function setStatus(key, vars) {
       lastStatus = { key, vars };
@@ -729,6 +754,11 @@
     async function handleFile(file) {
       resultsEl.innerHTML = '';
       lastDeviceStats = null;
+      lastShareData = null;
+      const shareWrapEl = document.getElementById('shareWrap');
+      if (shareWrapEl) { shareWrapEl.classList.add('hidden'); shareWrapEl.classList.remove('flex'); }
+      const noteHide = document.getElementById('priceNote');
+      if (noteHide) noteHide.classList.add('hidden');
       setStatus('statusPreparing', { name: file.name, size: (file.size / 1024 / 1024).toFixed(1) });
 
       const deviceStats = new Map();
@@ -863,6 +893,22 @@
       const sorted = Array.from(deviceStats.values()).sort((a, b) => b.totalSeconds - a.totalSeconds);
       resultsEl.innerHTML = '';
 
+      lastShareData = sorted.map((stat) => {
+        const hv = stat.totalSeconds / 3600;
+        const price = priceFor(stat.info);
+        return {
+          name: displayNameFor(stat.info),
+          model: modelLabelFor(stat.info),
+          hours: hv,
+          avgDb: stat.totalSeconds > 0 ? (stat.weightedDbSum / stat.totalSeconds).toFixed(1) : '0.0',
+          price: price,
+          cpScore: cpScoreFor(price, hv),
+          costPerHour: (price != null && hv > 0) ? price / hv : null
+        };
+      });
+      const shareWrapShow = document.getElementById('shareWrap');
+      if (shareWrapShow) { shareWrapShow.classList.remove('hidden'); shareWrapShow.classList.add('flex'); }
+
       const locale = currentLang === 'zh-HK' ? 'zh-HK' : 'en';
 
       for (const [idx, stat] of sorted.entries()) {
@@ -933,6 +979,183 @@
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
+
+    // ===== 一鍵生成分享圖（Canvas）=====
+    const SHARE_FONT = '"PingFang HK","PingFang SC","PingFang TC","Microsoft JhengHei","Segoe UI",Roboto,system-ui,sans-serif';
+
+    function dataURLToBlob(dataUrl) {
+      const parts = dataUrl.split(',');
+      const mime = parts[0].match(/:(.*?);/)[1];
+      const bin = atob(parts[1]);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type: mime });
+    }
+
+    function downloadBlob(blob, name) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    function drawShareCard(ctx, W, H, items) {
+      const locale = currentLang === 'zh-HK' ? 'zh-HK' : 'en';
+      const setFont = (size, weight) => { ctx.font = `${weight || 700} ${size}px ${SHARE_FONT}`; };
+      const roundRect = (x, y, w, h, r) => {
+        ctx.beginPath();
+        if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      };
+      const glow = (cx, cy, r, color) => {
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g.addColorStop(0, color);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      };
+      const truncate = (text, maxWidth) => {
+        if (ctx.measureText(text).width <= maxWidth) return text;
+        let s = text;
+        while (s.length > 1 && ctx.measureText(s + '…').width > maxWidth) s = s.slice(0, -1);
+        return s + '…';
+      };
+
+      const bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#0a0d14');
+      bg.addColorStop(1, '#0c1018');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+      glow(W * 0.1, H * 0.06, 640, 'rgba(56,189,248,0.30)');
+      glow(W * 0.98, H * 0.2, 560, 'rgba(139,92,246,0.30)');
+      glow(W * 0.5, H * 1.02, 720, 'rgba(236,72,153,0.22)');
+
+      const padX = 72;
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+
+      setFont(26, 600);
+      ctx.fillStyle = 'rgba(165,243,252,0.8)';
+      ctx.fillText(t('shareKicker'), padX, 112);
+
+      setFont(78, 800);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('Is my Pods Worth It?', padX, 198);
+
+      setFont(30, 500);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText(t('shareSubtitle', { n: items.length }), padX, 250);
+
+      const cx = padX, cy = 320, cw = W - padX * 2, ch = 762;
+      roundRect(cx, cy, cw, ch, 48);
+      ctx.fillStyle = 'rgba(255,255,255,0.07)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      const hi = ctx.createLinearGradient(0, cy, 0, cy + 140);
+      hi.addColorStop(0, 'rgba(255,255,255,0.16)');
+      hi.addColorStop(1, 'rgba(255,255,255,0)');
+      roundRect(cx, cy, cw, ch, 48);
+      ctx.fillStyle = hi;
+      ctx.fill();
+
+      const hero = items[0];
+      const inX = cx + 60;
+      const inR = cx + cw - 60;
+
+      setFont(56, 800);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(truncate(hero.name, cw - 120), inX, cy + 108);
+
+      setFont(30, 500);
+      ctx.fillStyle = 'rgba(165,243,252,0.9)';
+      ctx.fillText(truncate(hero.model, cw - 120), inX, cy + 156);
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(inX, cy + 196); ctx.lineTo(inR, cy + 196); ctx.stroke();
+
+      const rows = [
+        [t('totalDuration'), t('hours', { h: hero.hours.toFixed(1) })],
+        [t('weightedAvg'), t('db', { x: hero.avgDb })],
+        [t('costPerHour'), hero.costPerHour != null ? t('perHour', { x: 'HK$' + hero.costPerHour.toFixed(hero.costPerHour < 10 ? 1 : 0) }) : '—'],
+        [t('rrp'), hero.price != null ? 'HK$' + hero.price.toLocaleString(locale) : '—']
+      ];
+      let ry = cy + 262;
+      for (const [label, val] of rows) {
+        setFont(34, 500); ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.textAlign = 'left';
+        ctx.fillText(label, inX, ry);
+        setFont(36, 800); ctx.fillStyle = '#ffffff'; ctx.textAlign = 'right';
+        ctx.fillText(val, inR, ry);
+        ry += 66;
+      }
+      ctx.textAlign = 'left';
+
+      const cpLabelY = cy + ch - 176;
+      setFont(34, 600); ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText(t('cpScore'), inX, cpLabelY);
+
+      const barY = cpLabelY + 56;
+      const barW = cw - 120;
+      roundRect(inX, barY, barW, 16, 8);
+      ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.fill();
+
+      if (hero.cpScore != null) {
+        setFont(92, 800); ctx.fillStyle = '#ffffff'; ctx.textAlign = 'right';
+        ctx.fillText(String(hero.cpScore), inR - 92, cpLabelY + 18);
+        setFont(32, 600); ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillText('/100', inR, cpLabelY + 16);
+        ctx.textAlign = 'left';
+        const grad = ctx.createLinearGradient(inX, 0, inX + barW, 0);
+        grad.addColorStop(0, '#38bdf8'); grad.addColorStop(1, '#a78bfa');
+        roundRect(inX, barY, Math.max(16, barW * hero.cpScore / 100), 16, 8);
+        ctx.fillStyle = grad; ctx.fill();
+      } else {
+        setFont(38, 700); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.textAlign = 'right';
+        ctx.fillText(t('shareNoPrice'), inR, cpLabelY + 12); ctx.textAlign = 'left';
+      }
+
+      const rest = items.slice(1, 4);
+      if (rest.length) {
+        setFont(28, 600); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.textAlign = 'left';
+        const line = rest.map((it) => truncate(it.model, 300) + (it.cpScore != null ? ' · CP ' + it.cpScore : '')).join('    ');
+        ctx.fillText(truncate(line, W - padX * 2), padX, cy + ch + 74);
+      }
+
+      setFont(24, 500); ctx.fillStyle = 'rgba(255,255,255,0.42)'; ctx.textAlign = 'center';
+      ctx.fillText(t('shareFooter'), W / 2, H - 52, W - padX * 2);
+      ctx.textAlign = 'left';
+    }
+
+    function shareCard() {
+      if (!lastShareData || !lastShareData.length) return;
+      const W = 1080, H = 1350;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      drawShareCard(canvas.getContext('2d'), W, H, lastShareData);
+      const blob = dataURLToBlob(canvas.toDataURL('image/png'));
+      const file = new File([blob], 'is-my-pods-worth-it.png', { type: 'image/png' });
+      const shareText = t('shareText');
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], text: shareText, title: 'Is my Pods Worth It?' })
+          .catch(() => downloadBlob(blob, 'is-my-pods-worth-it.png'));
+      } else {
+        downloadBlob(blob, 'is-my-pods-worth-it.png');
+      }
+    }
+
+    const shareBtnEl = document.getElementById('shareBtn');
+    if (shareBtnEl) shareBtnEl.addEventListener('click', shareCard);
 
     applyStaticTexts();
   </script>
