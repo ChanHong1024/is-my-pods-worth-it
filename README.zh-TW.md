@@ -67,6 +67,17 @@
 
 > 忘記步驟？點選上傳區右上角的 **?** 按鈕，會有逐步匯出教學（會跟隨你選擇的語言）。
 
+## 專案結構
+
+| 檔案 | 用途 |
+| --- | --- |
+| `index.html` | 僅放 HTML 結構 |
+| `styles.css` | 自訂樣式（玻璃 UI、圖表、動畫） |
+| `app.js` | 解析、i18n、圖表、分享圖 |
+| `devices.js` | **支援裝置資料**：型號名稱＋建議售價。新增型號或改價格改這個檔 |
+
+新增裝置：開啟 `devices.js`，Apple 在 `MODEL_MAP` 與 `PRICE_APPLE` 各加一行；Sony 在 `PRICE_SONY` 加一行。繁中（台灣／大陸）、日文、韓文名稱會自動由 `zh-HK`／`en` 轉換。
+
 ## 技術棧
 
 - [Tailwind CSS](https://tailwindcss.com/)（Play CDN，免 build）

@@ -67,6 +67,17 @@ Switch anytime from the top-right dropdown; the choice is remembered, and the br
 
 > Forgot the steps? Tap the **?** button at the top-right of the upload area for a step-by-step guide in your language.
 
+## Project structure
+
+| File | Purpose |
+| --- | --- |
+| `index.html` | Markup only |
+| `styles.css` | Custom styles (glass UI, charts, animations) |
+| `app.js` | Parsing, i18n, charts, share image |
+| `devices.js` | **Supported devices**: model names + RRP. Add a model or change a price here |
+
+To add a device, open `devices.js` and add an entry to `MODEL_MAP` and `PRICE_APPLE` (Apple) or `PRICE_SONY` (Sony). The zh-TW / zh-CN / ja / ko names are generated automatically from the `zh-HK` / `en` labels.
+
 ## Tech stack
 
 - [Tailwind CSS](https://tailwindcss.com/) (Play CDN, no build step)
