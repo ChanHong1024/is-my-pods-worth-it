@@ -2,7 +2,9 @@
 
 > AirPods 分型號聆聽統計工具 · 100% 本地離線解析 Apple 健康匯出檔
 
-[English](README.md) | **繁體中文**
+**繁體中文（香港）** | [繁體中文（台灣）](README.zh-TW.md) | [简体中文](README.zh-CN.md) | [English](README.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+
+🔗 **Live Demo：** https://chanhong1024.github.io/is-my-pods-worth-it/
 
 ![Is my Pods Worth It?](og-image.png)
 
@@ -32,18 +34,44 @@
 - 📱 **響應式**：手機單欄、桌面多欄
 - ⚡ **串流解析**：大檔案用分塊（chunk）串流處理，唔會卡死
 
+## 支援語言
+
+| 語言 | 代碼 |
+| --- | --- |
+| 繁體中文（香港） | `zh-HK` |
+| 繁體中文（台灣） | `zh-TW` |
+| 簡體中文 | `zh-CN` |
+| English | `en` |
+| 日本語 | `ja` |
+| 한국어 | `ko` |
+
+右上角下拉選單可隨時切換，選擇會記住；首次到訪會自動偵測瀏覽器語言。
+
+## 支援裝置
+
+- **Apple**
+  - AirPods（第 1–5 代，包括 ANC 同無線充電版本）
+  - AirPods Pro（第 1–3 代；Lightning 同 USB-C）
+  - AirPods Max（第 1 代 Lightning／USB-C，以及 Max 2）
+  - EarPods（有線）
+- **Sony**
+  - WH-1000XM3 / XM4 / XM5 / XM6（頭戴式）
+  - WF-1000XM3 / XM4 / XM5（真無線）
+- 未知或其他藍牙／有線裝置會自動分組並標示。
+
 ## 使用方法
 
 1. 喺 iPhone 開「健康」App → 右上角個人頭像 → **匯出所有健康資料**
 2. 將匯出嘅 `export.zip` 拖入網頁（或者揀 `export.xml`）
 3. 即時見到分型號統計
 
-> 唔記得步驟？撳上傳區右上角嘅 **?** 掣，會有逐步匯出教學（中英對照）。
+> 唔記得步驟？撳上傳區右上角嘅 **?** 掣，會有逐步匯出教學（會跟隨你揀嘅語言）。
 
 ## 技術棧
 
 - [Tailwind CSS](https://tailwindcss.com/)（Play CDN，免 build）
 - [fflate](https://github.com/101arrowz/fflate)（ZIP 解壓）
+- Google Fonts — Noto Sans TC / SC / JP / KR
 - 純 HTML + Vanilla JS，無任何後端
 
 ## GitHub Pages 部署

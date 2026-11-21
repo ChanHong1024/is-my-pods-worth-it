@@ -2,7 +2,9 @@
 
 > Per-model headphone listening stats · 100% local, offline parsing of Apple Health exports
 
-**English** | [繁體中文](README.zh-HK.md)
+[繁體中文（香港）](README.zh-HK.md) | [繁體中文（台灣）](README.zh-TW.md) | [简体中文](README.zh-CN.md) | **English** | [日本語](README.ja.md) | [한국어](README.ko.md)
+
+🔗 **Live demo:** https://chanhong1024.github.io/is-my-pods-worth-it/
 
 ![Is my Pods Worth It?](og-image.png)
 
@@ -32,18 +34,44 @@ A pure front-end static site built with Apple's "Liquid Glass" glassmorphism UI.
 - 📱 **Responsive** — single column on mobile, multi-column on desktop
 - ⚡ **Streaming parser** — large files are processed in chunks so the UI never freezes
 
+## Supported languages
+
+| Language | Code |
+| --- | --- |
+| Traditional Chinese (Hong Kong) | `zh-HK` |
+| Traditional Chinese (Taiwan) | `zh-TW` |
+| Simplified Chinese | `zh-CN` |
+| English | `en` |
+| Japanese | `ja` |
+| Korean | `ko` |
+
+Switch anytime from the top-right dropdown; the choice is remembered, and the browser language is detected automatically on the first visit.
+
+## Supported devices
+
+- **Apple**
+  - AirPods (1st–5th generation, including ANC and wireless-charging variants)
+  - AirPods Pro (1st–3rd generation; Lightning and USB-C)
+  - AirPods Max (1st generation Lightning / USB-C, and Max 2)
+  - EarPods (wired)
+- **Sony**
+  - WH-1000XM3 / XM4 / XM5 / XM6 (over-ear)
+  - WF-1000XM3 / XM4 / XM5 (true wireless)
+- Unknown or other Bluetooth/wired devices are grouped and labelled automatically.
+
 ## Usage
 
 1. On your iPhone, open the **Health** app → profile picture (top right) → **Export All Health Data**
 2. Drag the exported `export.zip` into the site (or pick `export.xml`)
 3. See the per-model stats instantly
 
-> Forgot the steps? Tap the **?** button at the top-right of the upload area for a step-by-step, bilingual guide.
+> Forgot the steps? Tap the **?** button at the top-right of the upload area for a step-by-step guide in your language.
 
 ## Tech stack
 
 - [Tailwind CSS](https://tailwindcss.com/) (Play CDN, no build step)
 - [fflate](https://github.com/101arrowz/fflate) (ZIP decompression)
+- Google Fonts — Noto Sans TC / SC / JP / KR
 - Pure HTML + vanilla JS, no backend
 
 ## GitHub Pages deployment
