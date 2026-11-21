@@ -1727,7 +1727,7 @@
         <div class="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">${kpis}</div>
 
         ${noData ? `<div class="mt-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-sm text-white/60">${escapeHtml(t('noDataInRange'))}</div>` : `
-        <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div class="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
           <div class="liquid card-in rounded-2xl p-4 lg:col-span-2" style="animation-delay:.05s">
             <div class="mb-1 flex items-center justify-between gap-2">
               <h2 class="font-semibold">${escapeHtml(t('dailyUsage'))}</h2>
@@ -1799,7 +1799,7 @@
         const cWeek = document.getElementById('chartWeekday');
         if (cWeek) cWeek.innerHTML = svgBars(weekItems, { maxLabels: 7, gradId: 'gWeek', viewW: 520, viewH: 320, maxBar: 40 });
         const cMonth = document.getElementById('chartMonth');
-        if (cMonth) cMonth.innerHTML = svgBars(monthItems, { maxLabels: 8, gradId: 'gMonth', maxBar: 40 });
+        if (cMonth) cMonth.innerHTML = svgBars(monthItems, { maxLabels: 8, gradId: 'gMonth', maxBar: 40, viewH: 300 });
         const cClock = document.getElementById('chartClock');
         if (cClock) cClock.innerHTML = svgClock(hourlyBuckets(stat, from, to));
         const cHeat = document.getElementById('chartHeatmap');
