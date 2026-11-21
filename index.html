@@ -585,7 +585,7 @@
         shareBtn: '分享',
         shareText: '我嘅耳機聆聽報告 — 邊款最抵？ #IsMyPodsWorthIt',
         shareKicker: 'AIRPODS LISTENING REPORT',
-        shareSubtitle: '{n} 款耳機 · 100% 本地解析',
+        shareSubtitle: '{n} 款耳機',
         shareFooter: 'chanhong1024.github.io/is-my-pods-worth-it',
         shareNoPrice: '未能計算',
         shareModalTitle: '分享圖設定',
@@ -675,7 +675,7 @@
         shareBtn: 'Share',
         shareText: 'My headphone listening report — which is the best value? #IsMyPodsWorthIt',
         shareKicker: 'AIRPODS LISTENING REPORT',
-        shareSubtitle: '{n} devices · 100% local',
+        shareSubtitle: '{n} devices',
         shareFooter: 'chanhong1024.github.io/is-my-pods-worth-it',
         shareNoPrice: 'N/A',
         shareModalTitle: 'Share image settings',
@@ -1780,17 +1780,13 @@
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = 'left';
 
-      setFont(26, 600);
-      ctx.fillStyle = P.kicker;
-      ctx.fillText(t('shareKicker'), padX, 112);
-
       setFont(76, 800);
       ctx.fillStyle = P.text;
-      ctx.fillText(truncate(title, W - padX * 2), padX, 196);
+      ctx.fillText(truncate(title, W - padX * 2), padX, 150);
 
       setFont(30, 500);
       ctx.fillStyle = P.muted;
-      ctx.fillText(t('shareSubtitle', { n: items.length }), padX, 246);
+      ctx.fillText(t('shareSubtitle', { n: items.length }), padX, 204);
 
       const px = padX, py = 296, pw = W - padX * 2, ph = H - py - 116;
       roundRect(px, py, pw, ph, 40);
