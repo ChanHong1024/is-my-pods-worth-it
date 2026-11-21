@@ -49,6 +49,23 @@
       33% { transform: translate(40px, 30px) scale(1.08); }
       66% { transform: translate(-30px, -20px) scale(0.94); }
     }
+    /* 手機：光暈會蓋滿細螢幕令背景過光 → 收細光度＋加深底色 */
+    @media (max-width: 640px) {
+      .bg-scene {
+        background:
+          radial-gradient(700px 520px at 15% -10%, rgba(56, 189, 248, 0.08), transparent 60%),
+          radial-gradient(620px 460px at 90% 8%, rgba(167, 139, 250, 0.10), transparent 55%),
+          radial-gradient(650px 650px at 50% 120%, rgba(244, 114, 182, 0.07), transparent 60%),
+          #040408;
+      }
+      .bg-scene::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+      }
+      .orb { opacity: 0.2; filter: blur(90px); }
+    }
 
     /* Liquid Glass 核心效果 */
     .liquid {
