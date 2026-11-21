@@ -1490,7 +1490,7 @@
       const pad2 = (n) => String(n).padStart(2, '0');
       const center = `<text x="${cx}" y="${cy - 2}" text-anchor="middle" fill="#ffffff" font-size="30" font-weight="800">${pad2(peak)}:00</text>`
         + `<text x="${cx}" y="${cy + 20}" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="13">${escapeHtml(t('peakHour'))}</text>`;
-      return `<svg viewBox="0 0 ${size} ${size}" class="w-full" style="max-width:340px;display:block;margin:0 auto"><defs><linearGradient id="clockGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="rgba(255,255,255,0.45)"/></linearGradient></defs>${rings}${bars}${labels}${center}</svg>`;
+      return `<svg viewBox="0 0 ${size} ${size}" class="w-full" style="max-width:230px;display:block;margin:0 auto"><defs><linearGradient id="clockGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="rgba(255,255,255,0.45)"/></linearGradient></defs>${rings}${bars}${labels}${center}</svg>`;
     }
 
     function svgBars(items, opts) {
