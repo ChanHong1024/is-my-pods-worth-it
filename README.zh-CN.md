@@ -73,8 +73,11 @@
 | --- | --- |
 | `index.html` | 仅放 HTML 结构 |
 | `styles.css` | 自定义样式（玻璃 UI、图表、动画） |
-| `app.js` | 解析、i18n、图表、分享图 |
+| `app.js` | 解析、图表、分享图 |
+| `i18n.js` | **界面文字／翻译**（6 种语言） |
+| `svg.js` | SVG 定义 + 设备插图 |
 | `devices.js` | **支持的设备数据**：型号名称＋建议零售价。新增型号或改价格改这个文件 |
+| `favicon.svg` / `favicon-32.png` / `apple-touch-icon.png` | 浏览器标签图标与 Apple touch icon |
 
 新增设备：打开 `devices.js`，Apple 在 `MODEL_MAP` 与 `PRICE_APPLE` 各加一行；Sony 在 `PRICE_SONY` 加一行。繁体中文（台湾／大陆）、日文、韩文名称会自动由 `zh-HK`／`en` 转换。
 

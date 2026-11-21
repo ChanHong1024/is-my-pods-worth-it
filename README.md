@@ -73,8 +73,11 @@ Switch anytime from the top-right dropdown; the choice is remembered, and the br
 | --- | --- |
 | `index.html` | Markup only |
 | `styles.css` | Custom styles (glass UI, charts, animations) |
-| `app.js` | Parsing, i18n, charts, share image |
+| `app.js` | Parsing, charts, share image |
+| `i18n.js` | **UI text / translations** for all six languages |
+| `svg.js` | SVG defs + device illustrations |
 | `devices.js` | **Supported devices**: model names + RRP. Add a model or change a price here |
+| `favicon.svg` / `favicon-32.png` / `apple-touch-icon.png` | Browser tab icon and Apple touch icon |
 
 To add a device, open `devices.js` and add an entry to `MODEL_MAP` and `PRICE_APPLE` (Apple) or `PRICE_SONY` (Sony). The zh-TW / zh-CN / ja / ko names are generated automatically from the `zh-HK` / `en` labels.
 

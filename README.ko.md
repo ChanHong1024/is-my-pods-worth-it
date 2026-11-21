@@ -73,8 +73,11 @@ Apple의 "Liquid Glass" 글래스모피즘 UI로 만든 순수 프런트엔드 �
 | --- | --- |
 | `index.html` | HTML 마크업만 |
 | `styles.css` | 사용자 지정 스타일(글래스 UI, 차트, 애니메이션) |
-| `app.js` | 파싱, i18n, 차트, 공유 이미지 |
+| `app.js` | 파싱, 차트, 공유 이미지 |
+| `i18n.js` | **UI 텍스트／번역**(6개 언어) |
+| `svg.js` | SVG 정의＋기기 일러스트 |
 | `devices.js` | **지원 기기 정보**: 모델명＋권장 가격. 모델 추가나 가격 변경은 이 파일 |
+| `favicon.svg` / `favicon-32.png` / `apple-touch-icon.png` | 브라우저 탭 아이콘 및 Apple touch icon |
 
 기기를 추가하려면 `devices.js`를 열고 Apple은 `MODEL_MAP`과 `PRICE_APPLE`, Sony는 `PRICE_SONY`에 한 줄씩 추가하세요. 번체(대만/중국), 일본어, 한국어 이름은 `zh-HK`／`en`에서 자동 생성됩니다.
 

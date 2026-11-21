@@ -73,8 +73,11 @@
 | --- | --- |
 | `index.html` | 只放 HTML 結構 |
 | `styles.css` | 自訂樣式（玻璃 UI、圖表、動畫） |
-| `app.js` | 解析、i18n、圖表、分享圖 |
+| `app.js` | 解析、圖表、分享圖 |
+| `i18n.js` | **介面文字／翻譯**（6 種語言） |
+| `svg.js` | SVG 定義 + 裝置插圖 |
 | `devices.js` | **支援裝置資料**：型號名稱＋建議零售價。加型號或改價錢改呢個檔 |
+| `favicon.svg` / `favicon-32.png` / `apple-touch-icon.png` | 瀏覽器分頁圖示同 Apple touch icon |
 
 想新增裝置：打開 `devices.js`，Apple 喺 `MODEL_MAP` 同 `PRICE_APPLE` 各加一行；Sony 喺 `PRICE_SONY` 加一行。繁中（台灣／大陸）、日文、韓文名稱會自動由 `zh-HK`／`en` 轉換。
 

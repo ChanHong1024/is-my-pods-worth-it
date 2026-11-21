@@ -73,8 +73,11 @@ Apple の「Liquid Glass」グラスモーフィズム UI で作られた純粋�
 | --- | --- |
 | `index.html` | HTML マークアップのみ |
 | `styles.css` | カスタムスタイル（ガラス UI、グラフ、アニメーション） |
-| `app.js` | 解析、i18n、グラフ、共有画像 |
+| `app.js` | 解析、グラフ、共有画像 |
+| `i18n.js` | **UI テキスト／翻訳**（6 言語） |
+| `svg.js` | SVG 定義＋デバイスイラスト |
 | `devices.js` | **対応デバイス情報**：モデル名＋参考価格。モデル追加や価格変更はこのファイル |
+| `favicon.svg` / `favicon-32.png` / `apple-touch-icon.png` | ブラウザタブのアイコンと Apple touch icon |
 
 デバイスを追加するには `devices.js` を開き、Apple は `MODEL_MAP` と `PRICE_APPLE`、Sony は `PRICE_SONY` に 1 行追加します。繁体字（台湾／中国）、日本語、韓国語の名称は `zh-HK`／`en` から自動生成されます。
 
