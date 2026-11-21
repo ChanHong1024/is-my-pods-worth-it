@@ -1727,7 +1727,7 @@
         <div class="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">${kpis}</div>
 
         ${noData ? `<div class="mt-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-sm text-white/60">${escapeHtml(t('noDataInRange'))}</div>` : `
-        <div class="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+        <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div class="liquid card-in rounded-2xl p-4 lg:col-span-2" style="animation-delay:.05s">
             <div class="mb-1 flex items-center justify-between gap-2">
               <h2 class="font-semibold">${escapeHtml(t('dailyUsage'))}</h2>
@@ -1743,13 +1743,13 @@
             <h2 class="mb-1 font-semibold">${escapeHtml(t('weekdayTitle'))}</h2>
             <div id="chartWeekday"></div>
           </div>
-          <div class="liquid card-in rounded-2xl p-4 lg:col-span-2" style="animation-delay:.15s">
+          <div class="liquid card-in flex flex-col rounded-2xl p-4 lg:col-span-2" style="animation-delay:.15s">
             <h2 class="mb-1 font-semibold">${escapeHtml(t('monthTitle'))}</h2>
-            <div id="chartMonth"></div>
+            <div id="chartMonth" class="flex flex-1 items-center"></div>
           </div>
-          <div class="liquid card-in rounded-2xl p-4" style="animation-delay:.18s">
+          <div class="liquid card-in flex flex-col rounded-2xl p-4" style="animation-delay:.18s">
             <h2 class="mb-1 font-semibold">${escapeHtml(t('hourTitle'))}</h2>
-            <div id="chartClock"></div>
+            <div id="chartClock" class="flex flex-1 items-center justify-center"></div>
           </div>
           <div class="liquid card-in rounded-2xl p-4 lg:col-span-3" style="animation-delay:.2s">
             <h2 class="mb-1 font-semibold">${escapeHtml(t('calendarTitle'))}</h2>
