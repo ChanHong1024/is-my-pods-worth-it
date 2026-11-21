@@ -1563,9 +1563,11 @@
       const week = weekdayBuckets(stat, from, to);
       const locale = currentLang === 'zh-HK' ? 'zh-HK' : 'en';
 
-      const cp = agg.cpScore;
-      const price = agg.price;
-      const costPerHour = (price != null && agg.hours > 0) ? price / agg.hours : null;
+      // 「每小時成本」「CP 值評分」用全期數據，唔跟期間篩選
+      const price = priceFor(stat.info);
+      const totalHoursAll = stat.totalSeconds / 3600;
+      const cp = cpScoreFor(price, totalHoursAll);
+      const costPerHour = (price != null && totalHoursAll > 0) ? price / totalHoursAll : null;
       const perDay = agg.days > 0 ? agg.hours / agg.days : 0;
 
       const kpis = [
