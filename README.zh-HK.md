@@ -24,7 +24,7 @@
 - 🔒 **100% 本地**：所有解析都喺瀏覽器完成，資料**永不**上傳，離線都用到
 - 🎧 **分型號識別**：內置 Apple 耳機 Model 對照表（AirPods 1/2/3/4/5、AirPods Pro 1/2/3、AirPods Max 1/2），可分辨 AirPods Pro 第幾代（Lightning／USB-C 都分到）；亦支援 **Sony XM 系列**（WH-1000XM 頭戴、WF-1000XM 真無線）
 - 🔢 **兼容 hex 型號**：部分 iOS 版本喺 export 以 Apple 藍牙 Product ID 顯示（例如 `0x200E`＝AirPods Pro 1、`0x2014`＝AirPods Pro 2），已內置對照；有線 EarPods 亦會自動標示
-- 🌐 **雙語**：繁體中文（zh-HK）／ English 一鍵切換，自動偵測瀏覽器語言
+- 🌐 **六種語言**：繁體中文（香港／台灣）、簡體中文、English、日本語、한국어 一鍵切換，自動偵測瀏覽器語言
 - 🧊 **Liquid Glass UI**：Tailwind CSS + 玻璃擬態（backdrop-blur、specular 高光）
 - 💰 **CP 值評分**：內置 RRP（HK$，參考值，可自行調整），以「每小時聆聽成本」換算 0–100 分，越高越抵
 - 📊 **裝置詳情 Dashboard**：撳卡入獨立詳情頁（可返回、網址可分享），有 KPI、每日/每週/每月使用量圖（含音量走勢線）、日曆熱力圖、星期分佈、每月總量、**Chronodex 24 小時時間分佈錶盤**，同 `7日/30日/90日/1年/全部`＋自訂日期範圍篩選

@@ -24,7 +24,7 @@ A pure front-end static site built with Apple's "Liquid Glass" glassmorphism UI.
 - 🔒 **100% local** — everything is parsed in your browser; data is **never** uploaded and works offline
 - 🎧 **Per-model detection** — built-in Apple headphone model map (AirPods 1/2/3/4/5, AirPods Pro 1/2/3, AirPods Max 1/2), including which AirPods Pro generation (Lightning / USB-C), plus **Sony XM series** (WH-1000XM over-ear, WF-1000XM true wireless)
 - 🔢 **Hex model IDs** — some iOS versions report Apple Bluetooth Product IDs instead (e.g. `0x200E` = AirPods Pro 1, `0x2014` = AirPods Pro 2); wired EarPods are labelled too
-- 🌐 **Bilingual** — Traditional Chinese (zh-HK) / English toggle with automatic browser-language detection
+- 🌐 **Six languages** — Traditional Chinese (Hong Kong / Taiwan), Simplified Chinese, English, Japanese, and Korean, with a one-click switcher and automatic browser-language detection
 - 🧊 **Liquid Glass UI** — Tailwind CSS + glassmorphism (backdrop-blur, specular highlights)
 - 💰 **CP value score** — built-in RRP (HKD, reference values, adjustable), converted from cost-per-hour into a 0–100 score; the higher, the better the value
 - 📊 **Device dashboard** — tap a card to open a dedicated, shareable detail page (back button + shareable URL) with KPIs, daily/weekly/monthly usage charts (with volume trend line), calendar heatmap, weekday distribution, monthly totals, a **Chronodex time-of-day dial**, and `7d / 30d / 90d / 1y / All` + custom date-range filters
