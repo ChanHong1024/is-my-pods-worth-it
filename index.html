@@ -195,6 +195,47 @@
       pointer-events: none;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     }
+
+    /* 圖表動畫 */
+    .chart-bar {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      animation: barGrow .55s cubic-bezier(.2, .7, .2, 1) both;
+    }
+    @keyframes barGrow {
+      from { transform: scaleY(0); opacity: .35; }
+      to { transform: scaleY(1); opacity: 1; }
+    }
+    .chart-line {
+      stroke-dasharray: 20000;
+      stroke-dashoffset: 20000;
+      animation: lineDraw 1.15s ease forwards;
+    }
+    @keyframes lineDraw { to { stroke-dashoffset: 0; } }
+    .chart-cell {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: cellIn .45s ease both;
+    }
+    @keyframes cellIn {
+      from { opacity: 0; transform: scale(.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .kpi-in {
+      animation: kpiIn .5s cubic-bezier(.2, .7, .2, 1) both;
+    }
+    @keyframes kpiIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .chart-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    @media (max-width: 640px) {
+      .chart-scroll svg { min-width: 560px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .chart-bar, .chart-line, .chart-cell, .kpi-in { animation: none !important; }
+    }
   </style>
 </head>
 <body class="min-h-screen text-white">
@@ -1012,6 +1053,7 @@
     }
 
     async function handleFile(file) {
+      if (/^#\/device\//.test(location.hash)) location.hash = '';
       resultsEl.innerHTML = '';
       lastDeviceStats = null;
       lastShareData = null;
@@ -1267,7 +1309,10 @@
             ${cpScore != null ? `<div class="h-1.5 w-full overflow-hidden rounded-full bg-white/10"><div class="h-full rounded-full" style="width:${cpScore}%;background:linear-gradient(90deg,#38bdf8,#a78bfa)"></div></div>` : ''}
           </div>
         `;
-        card.addEventListener('click', () => { location.hash = '#/device/' + encodeURIComponent(stat.info.key); });
+        card.addEventListener('click', () => {
+          const target = '#/device/' + encodeURIComponent(stat.info.key);
+          if (location.hash === target) handleRoute(); else location.hash = target;
+        });
         resultsEl.appendChild(card);
       }
     }
@@ -1368,7 +1413,7 @@
         const bh = (h / maxH) * plotH;
         const x = padL + i * step + (step - bw) / 2;
         const y = padT + plotH - bh;
-        bars += `<rect class="chart-bar" data-tip="${escapeHtml(it.tip || '')}" x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${bw.toFixed(2)}" height="${bh > 0 ? Math.max(bh, 1.5).toFixed(2) : 0}" rx="2.5" fill="url(#${gid})"></rect>`;
+        bars += `<rect class="chart-bar" data-tip="${escapeHtml(it.tip || '')}" style="animation-delay:${Math.min(i * 8, 260)}ms" x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${bw.toFixed(2)}" height="${bh > 0 ? Math.max(bh, 1.5).toFixed(2) : 0}" rx="2.5" fill="url(#${gid})"></rect>`;
       });
       let line = '';
       if (opts.showVolume) {
@@ -1384,7 +1429,7 @@
             d += (started ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
             started = true;
           });
-          line = `<path d="${d}" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"></path>`;
+          line = `<path class="chart-line" d="${d}" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"></path>`;
         }
       }
       let grid = '';
@@ -1397,7 +1442,7 @@
         const it = items[i]; const x = padL + i * step + step / 2;
         xl += `<text x="${x.toFixed(1)}" y="${H - 9}" fill="rgba(255,255,255,.45)" font-size="15" text-anchor="middle">${escapeHtml(it.label || '')}</text>`;
       }
-      return `<svg viewBox="0 0 ${W} ${H}" class="w-full"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs>${grid}${bars}${line}${xl}</svg>`;
+      return `<svg viewBox="0 0 ${W} ${H}" class="w-full"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="rgba(255,255,255,0.42)"/></linearGradient></defs>${grid}${bars}${line}${xl}</svg>`;
     }
 
     function svgHeatmap(stat, endKey) {
@@ -1429,7 +1474,7 @@
         }
         const x = leftPad + g.w * (cell + gap), y = topPad + g.d * (cell + gap);
         const tip = g.k + ' · ' + t('hours', { h: g.h.toFixed(1) });
-        return `<rect class="chart-cell" data-tip="${escapeHtml(tip)}" x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${fill}"></rect>`;
+        return `<rect class="chart-cell" data-tip="${escapeHtml(tip)}" style="animation-delay:${Math.min(g.w * 6 + g.d * 2, 400)}ms" x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${fill}"></rect>`;
       }).join('');
       let monthLabels = '', prev = '';
       for (let w = 0; w < weeks; w++) {
@@ -1496,8 +1541,8 @@
       }
     }
 
-    function kpiCard(label, value) {
-      return `<div class="liquid-soft rounded-2xl px-3 py-2.5"><div class="text-[11px] uppercase tracking-wide text-white/45">${escapeHtml(label)}</div><div class="mt-1 text-lg font-bold">${value}</div></div>`;
+    function kpiCard(label, value, idx) {
+      return `<div class="liquid-soft kpi-in rounded-2xl px-3 py-2.5" style="animation-delay:${Math.min((idx || 0) * 35, 350)}ms"><div class="text-[11px] uppercase tracking-wide text-white/45">${escapeHtml(label)}</div><div class="mt-1 text-base font-bold sm:text-lg">${value}</div></div>`;
     }
 
     function renderDetail(key, from, to) {
@@ -1534,7 +1579,7 @@
         [t('rrp'), price != null ? 'HK$' + price.toLocaleString(locale) : '—'],
         [t('costPerHour'), costPerHour != null ? t('perHour', { x: 'HK$' + costPerHour.toFixed(costPerHour < 10 ? 1 : 0) }) : '—'],
         [t('cpScore'), cp != null ? t('score', { n: cp }) : t('cpNA')]
-      ].map(([l, v]) => kpiCard(l, v)).join('');
+      ].map(([l, v], i) => kpiCard(l, v, i)).join('');
 
       const noData = agg.sec === 0;
 
@@ -1551,50 +1596,50 @@
         </div>
 
         <div class="liquid rounded-2xl p-3 sm:p-4">
-          <div class="flex flex-wrap items-center gap-3">
+          <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <span class="text-xs font-medium uppercase tracking-wide text-white/45">${escapeHtml(t('period'))}</span>
-            <div id="periodGroup" class="liquid-soft inline-flex flex-wrap rounded-full p-1">
-              <button data-days="7" class="seg-btn rounded-full px-3 py-1.5 text-sm">${escapeHtml(t('period7'))}</button>
-              <button data-days="30" class="seg-btn rounded-full px-3 py-1.5 text-sm">${escapeHtml(t('period30'))}</button>
-              <button data-days="90" class="seg-btn rounded-full px-3 py-1.5 text-sm">${escapeHtml(t('period90'))}</button>
-              <button data-days="365" class="seg-btn rounded-full px-3 py-1.5 text-sm">${escapeHtml(t('period365'))}</button>
-              <button data-days="all" class="seg-btn rounded-full px-3 py-1.5 text-sm">${escapeHtml(t('periodAll'))}</button>
+            <div id="periodGroup" class="liquid-soft flex w-full rounded-full p-1 sm:inline-flex sm:w-auto">
+              <button data-days="7" class="seg-btn flex-1 rounded-full px-2 py-1.5 text-sm sm:flex-none sm:px-3">${escapeHtml(t('period7'))}</button>
+              <button data-days="30" class="seg-btn flex-1 rounded-full px-2 py-1.5 text-sm sm:flex-none sm:px-3">${escapeHtml(t('period30'))}</button>
+              <button data-days="90" class="seg-btn flex-1 rounded-full px-2 py-1.5 text-sm sm:flex-none sm:px-3">${escapeHtml(t('period90'))}</button>
+              <button data-days="365" class="seg-btn flex-1 rounded-full px-2 py-1.5 text-sm sm:flex-none sm:px-3">${escapeHtml(t('period365'))}</button>
+              <button data-days="all" class="seg-btn flex-1 rounded-full px-2 py-1.5 text-sm sm:flex-none sm:px-3">${escapeHtml(t('periodAll'))}</button>
             </div>
-            <div class="ml-auto flex items-center gap-2 text-xs text-white/70">
-              <input type="date" id="detailFrom" value="${from}" class="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-white/80 [color-scheme:dark]" />
+            <div class="flex w-full items-center gap-2 text-xs text-white/70 sm:ml-auto sm:w-auto">
+              <input type="date" id="detailFrom" value="${from}" class="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-white/80 [color-scheme:dark] sm:flex-none" />
               <span>–</span>
-              <input type="date" id="detailTo" value="${to}" class="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-white/80 [color-scheme:dark]" />
-              <button id="detailApply" class="liquid-soft rounded-full px-3 py-1.5 font-semibold text-white">${escapeHtml(t('apply'))}</button>
+              <input type="date" id="detailTo" value="${to}" class="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-white/80 [color-scheme:dark] sm:flex-none" />
+              <button id="detailApply" class="liquid-soft shrink-0 rounded-full px-3 py-1.5 font-semibold text-white">${escapeHtml(t('apply'))}</button>
             </div>
           </div>
         </div>
 
-        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">${kpis}</div>
+        <div class="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">${kpis}</div>
 
         ${noData ? `<div class="mt-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-sm text-white/60">${escapeHtml(t('noDataInRange'))}</div>` : `
         <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div class="liquid rounded-2xl p-4 lg:col-span-2">
+          <div class="liquid card-in rounded-2xl p-4 lg:col-span-2" style="animation-delay:.05s">
             <div class="mb-1 flex items-center justify-between gap-2">
               <h2 class="font-semibold">${escapeHtml(t('dailyUsage'))}</h2>
               <span class="flex items-center gap-3 text-xs text-white/50">
-                <span class="inline-flex items-center gap-1"><span class="inline-block h-2 w-3 rounded-sm" style="background:linear-gradient(180deg,#38bdf8,#a78bfa)"></span>${escapeHtml(t('legendHours'))}</span>
+                <span class="inline-flex items-center gap-1"><span class="inline-block h-2 w-3 rounded-sm" style="background:linear-gradient(180deg,#ffffff,rgba(255,255,255,.5))"></span>${escapeHtml(t('legendHours'))}</span>
                 <span class="inline-flex items-center gap-1"><span class="inline-block h-0.5 w-3 rounded-full bg-[#c4b5fd]"></span>${escapeHtml(t('legendVolume'))}</span>
               </span>
             </div>
-            <div id="chartDaily"></div>
+            <div id="chartDaily" class="chart-scroll"></div>
             <div class="mt-1 text-right text-[11px] text-white/40">${escapeHtml(t(gran === 'day' ? 'granDaily' : gran === 'week' ? 'granWeekly' : 'granMonthly'))}</div>
           </div>
-          <div class="liquid rounded-2xl p-4">
+          <div class="liquid card-in rounded-2xl p-4" style="animation-delay:.1s">
             <h2 class="mb-1 font-semibold">${escapeHtml(t('weekdayTitle'))}</h2>
             <div id="chartWeekday"></div>
           </div>
-          <div class="liquid rounded-2xl p-4 lg:col-span-2">
+          <div class="liquid card-in rounded-2xl p-4 lg:col-span-2" style="animation-delay:.15s">
             <h2 class="mb-1 font-semibold">${escapeHtml(t('monthTitle'))}</h2>
             <div id="chartMonth"></div>
           </div>
-          <div class="liquid rounded-2xl p-4 lg:col-span-3">
+          <div class="liquid card-in rounded-2xl p-4 lg:col-span-3" style="animation-delay:.2s">
             <h2 class="mb-1 font-semibold">${escapeHtml(t('calendarTitle'))}</h2>
-            <div id="chartHeatmap" class="overflow-x-auto"></div>
+            <div id="chartHeatmap" class="chart-scroll"></div>
           </div>
         </div>`}
       `;
