@@ -1399,13 +1399,13 @@
 
     function svgBars(items, opts) {
       opts = opts || {};
-      const W = 1000, H = opts.showVolume ? 300 : 240;
+      const W = opts.viewW || 1000, H = opts.viewH || (opts.showVolume ? 300 : 240);
       const padL = 12, padR = 12, padT = 18, padB = 28;
       const plotW = W - padL - padR, plotH = H - padT - padB;
       const n = items.length || 1;
       const maxH = Math.max(0.0001, ...items.map((it) => Math.max(0, it.h || 0)));
       const step = plotW / n;
-      const bw = Math.max(1, Math.min(step * 0.68, 20));
+      const bw = Math.max(1, Math.min(step * 0.68, opts.maxBar || 20));
       const gid = opts.gradId || 'barGrad';
       let bars = '';
       items.forEach((it, i) => {
@@ -1683,9 +1683,9 @@
         const cDaily = document.getElementById('chartDaily');
         if (cDaily) cDaily.innerHTML = svgBars(dailyItems, { showVolume: true, maxLabels: 6, gradId: 'gDaily' });
         const cWeek = document.getElementById('chartWeekday');
-        if (cWeek) cWeek.innerHTML = svgBars(weekItems, { maxLabels: 7, gradId: 'gWeek' });
+        if (cWeek) cWeek.innerHTML = svgBars(weekItems, { maxLabels: 7, gradId: 'gWeek', viewW: 520, viewH: 320, maxBar: 40 });
         const cMonth = document.getElementById('chartMonth');
-        if (cMonth) cMonth.innerHTML = svgBars(monthItems, { maxLabels: 8, gradId: 'gMonth' });
+        if (cMonth) cMonth.innerHTML = svgBars(monthItems, { maxLabels: 8, gradId: 'gMonth', maxBar: 40 });
         const cHeat = document.getElementById('chartHeatmap');
         if (cHeat) cHeat.innerHTML = svgHeatmap(stat, range.max);
         wireChartTooltips(el);
